@@ -6,10 +6,28 @@ import os
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
 train = train.as_matrix()
 
+"""
+w: weight
+learning: learning rate
+lam: lamda for gradient computation
+converage: converage limit value
+"""	
+def grad_descent(DATA, y, learning, lam, converage):
 
+	w = np.zeros(45)
+       
+	for runs in range(1000000):
+		gradient = grad (w, DATA[runs,:], y, lam)
+		w = w - (learning * gradient)
+		if runs % 1000 == 0:
+			print ("w: ", w)
+		if g <= converage:
+			break
+		if runs >= 200000:
+			break
 
-def grad_descent()
-=======
+	return w          
+
 """
     The gradient of the linear regression with l2 regularization cost function
     x:input dataset
