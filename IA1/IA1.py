@@ -16,7 +16,7 @@ converage: converage limit value
 """	
 def grad_descent(DATA, y, learning, lam, converage):
 
-	w = np.zeros(45)
+	w = np.zeros(20)
        
 	for runs in range(1000000):
 		gradient = grad (w, DATA[runs,:], y, lam)
