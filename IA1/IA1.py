@@ -10,25 +10,30 @@ test = test.as_matrix()
 
 
 def split_date(cut_head_data):
-    r = 0
 
     split_date_data = copy.deepcopy(cut_head_data)
 
     sd_data = np.zeros((10000,3))
         
-    for ea_date_str in split_date_data:
+    for idx_r, ea_date_str in enumerate(split_date_data):
         data_features = ea_date_str.split("/")
         for idx in range(0,3):
-            sd_data[r,idx] = data_features[idx-1]
-        r += 1
+            sd_data[idx_r,idx] = data_features[idx-1]
+        idx_r += 1
     h_data_set = np.hsplit(sd_data,3)
     return h_data_set
 
 def add_in_arrays(ea_col, data, min_array, max_array):
+    """
+    Add the max and the min in an array.
+    """
     max_array[ea_col] = np.max(data)
     min_array[ea_col] = np.min(data)
 
 def norm_data(ea_col, cut_head_data, min_array, max_array):
+    """
+    Normalize data.
+    """
     new_data = (cut_head_data - min_array[ea_col]) / (max_array[ea_col] - min_array[ea_col])
     print(new_data)
     print('=====')
@@ -89,7 +94,7 @@ def process_columns():
 
 
 
-def grad_descent()
+def grad_descent():
 =======
 """
     The gradient of the linear regression with l2 regularization cost function
