@@ -115,7 +115,6 @@ def process_columns():
 
 
 
-def grad_descent():
 """
     The gradient of the linear regression with l2 regularization cost function
     x:input dataset
