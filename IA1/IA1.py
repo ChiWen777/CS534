@@ -23,7 +23,7 @@ def grad_descent(DATA, y, learning, lam, converage):
 		w = w - (learning * gradient)
 		if runs % 1000 == 0:
 			print ("w: ", w)
-		if g <= converage:
+		if gradient <= converage:
 			break
 		if runs >= 200000:
 			break
