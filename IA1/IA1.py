@@ -6,16 +6,17 @@ import copy
 
 
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
-train = train.as_matrix()
+train = train.values
 test = pd.read_csv('PA1_test.csv', sep=',',header=None)
-test = test.as_matrix()
+test = test.values
 dev = pd.read_csv('PA1_dev.csv', sep=',',header=None)
-dev = dev.as_matrix()
+dev = dev.values
 normalized_train_data = np.zeros((10000, 22))  ## take out id and price 
 normalized_test_data = np.zeros((6000, 22))  ## take out id 
 normalized_dev_data = np.zeros((5597, 22))  ## take out id and price 
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
+learning = 1
           
 
 
@@ -192,7 +193,7 @@ def grad(w, x, y, lamda):
     N = x.shape[0]      #we need to know how many data in each column(How many rows)
 
     for i in range(0, N):
-        sum_up = 2 * (np.dot(w, x[i]) - y[i]) * y[i] + 2 * lamda * w
+        sum_up = 2 * (np.dot(w, x[i]) - y[i]) * x[i] + 2 * lamda * w
     return sum_up
 
 """
@@ -207,14 +208,14 @@ def grad_descent (x, y, learning):
     converage=0.5
 
     for runs in range(1000000):
-        gradient = grad(w, normalized_train_data, y_train_data, 0)
+        gradient = grad(w, x, y, 0)
         w = w - (learning * gradient)
         normalg= np.linalg.norm(gradient)
-        if runs % 1000 == 0:
-            print ("w: ", w)
+        print("w: ", w)
+        # if runs % 100 == 0:
+        #     print ("w: ", w)
         if normalg <= converage:
-            break
-        if runs >= 200000:
+            print("normalg <= converage!!!")
             break
 
     return normalg, w
@@ -227,23 +228,24 @@ def grad_descent (x, y, learning):
     lamda:regularization factor
     rate:learning rat
 '''
-def diff_lamda(x, y, lamda):
+# def diff_lamda(x, y, lamda):
     
-    w = np.zeros(20)   #initial w
-    rate =  #fixed rate
-    converage=0.5
+#     w = np.zeros(20)   #initial w
+#     rate =  #fixed rate
+#     converage=0.5
 
-    # gradient descent algorithm with different lamda
-    lamda_array = [0.001, 0.01, 0.1, 0, 1, 10, 100]
-    for lamda in lamda_array:
-        for runs in range(1000000):
-            E = grad(w, normalized_train_data, y_train_data, lamda)
-            w = w - ( rate * E)
-            if normalg <= converage:
-                break
+#     # gradient descent algorithm with different lamda
+#     lamda_array = [0.001, 0.01, 0.1, 0, 1, 10, 100]
+#     for lamda in lamda_array:
+#         for runs in range(1000000):
+#             E = grad(w, normalized_train_data, y_train_data, lamda)
+#             w = w - ( rate * E)
+#             if normalg <= converage:
+#                 break
             
-    return normalg, w
+#     return normalg, w
 
     
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
+    grad_descent (normalized_train_data, y_train_data, learning)
