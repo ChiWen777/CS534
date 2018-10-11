@@ -17,6 +17,27 @@ normalized_dev_data = np.zeros((5597, 22))  ## take out id and price
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
 
+"""
+w: weight
+learning: learning rate
+lam: lamda for gradient computation
+converage: converage limit value
+"""	
+def grad_descent(DATA, y, learning, lam, converage):
+
+	w = np.zeros(20)
+       
+	for runs in range(1000000):
+		gradient = grad (w, DATA[runs,:], y, lam)
+		w = w - (learning * gradient)
+		if runs % 1000 == 0:
+			print ("w: ", w)
+		if gradient <= converage:
+			break
+		if runs >= 200000:
+			break
+
+	return w          
 
 
 def split_date(cut_head_data, whichForm):
@@ -179,8 +200,6 @@ def process_columns():
             
     return y_train_data, y_dev_data
 
-def grad_descent():
-    
 """
     The gradient of the linear regression with l2 regularization cost function
     x:input dataset
@@ -209,7 +228,7 @@ def grad(w, x, y, lamda):
 def diff_lamda(x, y, rate, lamda):
 	
 	w = 1	#initial w
-	rate = 			#fixed rate
+    rate = 	#fixed rate
 
 	# gradient descent algorithm with different lamda
 	lamda_array = [0.001, 0.01, 0.1, 0, 1, 10, 100]
