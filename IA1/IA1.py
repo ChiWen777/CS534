@@ -22,7 +22,7 @@ w: weight
 learning: learning rate
 converage: converage limit value
 """	
-def grad_descent (learning, converage):
+def grad_descent (learning, converage=0.5):
 
 	w = np.zeros(20)
        
