@@ -20,10 +20,9 @@ y_dev_data = np.zeros((5597, ))
 """
 w: weight
 learning: learning rate
-lam: lamda for gradient computation
 converage: converage limit value
 """	
-def grad_descent(DATA, y, learning, lam, converage):
+def grad_descent (learning, converage):
 
 	w = np.zeros(20)
        
