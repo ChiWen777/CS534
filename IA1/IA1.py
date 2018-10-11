@@ -217,7 +217,7 @@ def grad_descent (x, y, learning):
         if runs >= 200000:
             break
 
-    return nornalg, w
+    return normalg, w
 
 
 '''
@@ -239,9 +239,10 @@ def diff_lamda(x, y, lamda):
         for runs in range(1000000):
             E = grad(w, normalized_train_data, y_train_data, lamda)
             w = w - ( rate * E)
-            print(w, E)
-
-    return w
+            if normalg <= converage:
+                break
+            
+    return normalg, w
 
     
 if __name__ == "__main__":
