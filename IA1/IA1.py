@@ -16,7 +16,7 @@ normalized_test_data = np.zeros((6000, 22))  ## take out id
 normalized_dev_data = np.zeros((5597, 22))  ## take out id and price 
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
-learning = 1
+learning = pow(10, -7)
           
 
 
@@ -101,6 +101,7 @@ def process_columns():
         elif ea_col == 1:
             pass
         elif ea_col == 21:
+            cut_head_data = cut_head_data.astype(float)
             y_train_data = cut_head_data
         else:
             cut_head_data = cut_head_data.astype(float)
@@ -171,6 +172,7 @@ def process_columns():
         elif ea_col == 1:
             pass
         elif ea_col == 21:
+            cut_head_data = cut_head_data.astype(float)
             y_dev_data = cut_head_data
         else:
             cut_head_data = cut_head_data.astype(float)
@@ -204,7 +206,7 @@ converage: converage limit value
 """ 
 def grad_descent (x, y, learning):
 
-    w = np.zeros(20)
+    w = np.zeros(22)
     converage=0.5
 
     for runs in range(1000000):
