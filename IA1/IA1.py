@@ -20,24 +20,24 @@ y_dev_data = np.zeros((5597, ))
 """
 w: weight
 learning: learning rate
-lam: lamda for gradient computation
 converage: converage limit value
 """	
-def grad_descent(DATA, y, learning, lam, converage):
+def grad_descent (learning, converage=0.5):
 
 	w = np.zeros(20)
        
 	for runs in range(1000000):
-		gradient = grad (w, DATA[runs,:], y, lam)
+		gradient = grad (w)
 		w = w - (learning * gradient)
+		normalg= np.linalg.norm(gradient)
 		if runs % 1000 == 0:
 			print ("w: ", w)
-		if gradient <= converage:
+		if normalg <= converage:
 			break
 		if runs >= 200000:
 			break
 
-	return w          
+	return nornalg, w          
 
 
 def split_date(cut_head_data, whichForm):
