@@ -26,6 +26,7 @@ def run_init_diff_learningrate():
         learning = ea_l
         grad_descent (normalized_train_data, y_train_data, learning)
         plt.plot(normalg_list)
+        del normalg_list[:]
 
 
 def split_date(cut_head_data, whichForm):
@@ -226,13 +227,12 @@ def grad_descent (x, y, learning):
         gradient = grad(w, x, y, 0)
         w = w - (learning * gradient)
         normalg= np.linalg.norm(gradient)
-        print("normalg: ", normalg)
+        # print("normalg: ", normalg)
         normalg_list.append(normalg)
         # if runs % 100 == 0:
         #     print ("w: ", w)
         if normalg <= converage:
             print("normalg <= converage!!!")
-            del normalg_list[:]
             break
 
     return normalg, w
