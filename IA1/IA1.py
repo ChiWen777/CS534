@@ -50,6 +50,7 @@ def split_date(cut_head_data, whichForm):
         sd_data = np.zeros((5597,3))
         
     for idx_r, ea_date_str in enumerate(split_date_data):
+        #split year, month and date
         data_features = ea_date_str.split("/")
         for idx in range(0,3):
             sd_data[idx_r,idx] = data_features[idx-1]
@@ -105,9 +106,11 @@ def process_columns():
         
         orig_data = train[:,ea_col]
         
+        #cut_head_data will cut off the title of each column
         cut_head_data = copy.deepcopy(orig_data)
         cut_head_data = cut_head_data[1:]
         
+        # need to split the date time
         if ea_col == 2:
             date_data = split_date(cut_head_data, whichForm)
             for ea_date_data in date_data:
