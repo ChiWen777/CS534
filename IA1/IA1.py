@@ -6,11 +6,11 @@ import copy
 
 
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
-train = train.as_matrix()
+train = train.values
 test = pd.read_csv('PA1_test.csv', sep=',',header=None)
-test = test.as_matrix()
+test = test.values
 dev = pd.read_csv('PA1_dev.csv', sep=',',header=None)
-dev = dev.as_matrix()
+dev = dev.values
 normalized_train_data = np.zeros((10000, 22))  ## take out id and price 
 normalized_test_data = np.zeros((6000, 22))  ## take out id 
 normalized_dev_data = np.zeros((5597, 22))  ## take out id and price 
