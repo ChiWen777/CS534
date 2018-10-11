@@ -3,6 +3,7 @@ import pandas as pd
 import csv
 import os
 import copy
+import matplotlib.pyplot as plt
 
 
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
@@ -16,8 +17,15 @@ normalized_test_data = np.zeros((6000, 22))  ## take out id
 normalized_dev_data = np.zeros((5597, 22))  ## take out id and price 
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
-learning = pow(10, -7)
+learning_list = [pow(10, 0),pow(10, -1),pow(10, -2),pow(10, -3),pow(10, -4),pow(10, -5),pow(10, -6),pow(10, -7)]
+normalg_list = list()
           
+
+def run_init_diff_learningrate():
+    for ea_l in learning_list:
+        learning = ea_l
+        grad_descent (normalized_train_data, y_train_data, learning)
+        plt.plot(normalg_list)
 
 
 def split_date(cut_head_data, whichForm):
@@ -182,6 +190,8 @@ def process_columns():
             
     return y_train_data, y_dev_data
 
+
+
 """
     The gradient of the linear regression with l2 regularization cost function
     x:input dataset
@@ -195,8 +205,11 @@ def grad(w, x, y, lamda):
     N = x.shape[0]      #we need to know how many data in each column(How many rows)
 
     for i in range(0, N):
+        
         sum_up = 2 * (np.dot(w, x[i]) - y[i]) * x[i] + 2 * lamda * w
     return sum_up
+
+
 
 """
 The grad_descent function of different learning rate and fixed lamda
@@ -213,11 +226,13 @@ def grad_descent (x, y, learning):
         gradient = grad(w, x, y, 0)
         w = w - (learning * gradient)
         normalg= np.linalg.norm(gradient)
-        print("w: ", w)
+        print("normalg: ", normalg)
+        normalg_list.append(normalg)
         # if runs % 100 == 0:
         #     print ("w: ", w)
         if normalg <= converage:
             print("normalg <= converage!!!")
+            del normalg_list[:]
             break
 
     return normalg, w
@@ -247,7 +262,8 @@ def grad_descent (x, y, learning):
             
 #     return normalg, w
 
+
     
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
-    grad_descent (normalized_train_data, y_train_data, learning)
+    run_init_diff_learningrate()
