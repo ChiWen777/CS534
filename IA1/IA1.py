@@ -24,7 +24,7 @@ y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
 # learning_list = [pow(10, 0),pow(10, -1),pow(10, -2),pow(10, -3),pow(10, -4),pow(10, -5),pow(10, -6),pow(10, -7)]
 
-learning = pow(10, -5)
+learning = pow(10, -1)
 normalg_list = list()
 
 
@@ -241,9 +241,8 @@ def grad_descent (x, y, learning):
         #     print ("w: ", w)
         if normalg <= converage:
             print("normalg <= converage!!!")
-            del normalg_list[:]
             break
-    print("w: ", )
+    print("w: ",w )
     return w
 
 
