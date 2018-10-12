@@ -5,8 +5,9 @@ import os
 import copy
 import matplotlib.pyplot as plt
 
-##part1
 
+##part1
+pwd = os.getcwd()
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
 train = train.values
 test = pd.read_csv('PA1_test.csv', sep=',',header=None)
@@ -277,7 +278,8 @@ if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
     grad_descent(normalized_train_data, y_train_data, learning)
     plt.plot(normalg_list)
-    plt.show()
+    plt.savefig(pwd+"/pic.png")
+    # plt.show()
     del normalg_list[:]
 
-    cross_comparison_dev( bill_input_w, y_dev_data)
+    # cross_comparison_dev( bill_input_w, y_dev_data)
