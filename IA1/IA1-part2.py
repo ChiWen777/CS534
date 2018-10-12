@@ -5,7 +5,6 @@ import os
 import copy
 import matplotlib.pyplot as plt
 
-##part1
 
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
 train = train.values
