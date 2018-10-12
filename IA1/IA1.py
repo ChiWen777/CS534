@@ -17,16 +17,11 @@ normalized_test_data = np.zeros((6000, 22))  ## take out id
 normalized_dev_data = np.zeros((5597, 22))  ## take out id and price 
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
-learning_list = [pow(10, 0),pow(10, -1),pow(10, -2),pow(10, -3),pow(10, -4),pow(10, -5),pow(10, -6),pow(10, -7)]
+# learning_list = [pow(10, 0),pow(10, -1),pow(10, -2),pow(10, -3),pow(10, -4),pow(10, -5),pow(10, -6),pow(10, -7)]
+learning = pow(10, -5)
 normalg_list = list()
-          
 
-def run_init_diff_learningrate():
-    for ea_l in learning_list:
-        learning = ea_l
-        grad_descent (normalized_train_data, y_train_data, learning)
-        plt.plot(normalg_list)
-        del normalg_list[:]
+
 
 
 def split_date(cut_head_data, whichForm):
@@ -193,15 +188,14 @@ def process_columns():
 
 
 
-"""
+def grad(w, x, y, lamda):   
+    """
     The gradient of the linear regression with l2 regularization cost function
     x:input dataset
     y:output dataset
     lamda:regularization factor
-    
-"""
-def grad(w, x, y, lamda):   
-    
+    """
+
     sum_up = 0
     N = x.shape[0]      #we need to know how many data in each column(How many rows)
 
@@ -212,13 +206,13 @@ def grad(w, x, y, lamda):
 
 
 
-"""
-The grad_descent function of different learning rate and fixed lamda
-w: weight
-learning: learning rate
-converage: converage limit value
-""" 
 def grad_descent (x, y, learning):
+    """
+    The grad_descent function of different learning rate and fixed lamda
+    w: weight
+    learning: learning rate
+    converage: converage limit value
+    """ 
 
     w = np.zeros(22)
     converage=0.5
@@ -234,36 +228,67 @@ def grad_descent (x, y, learning):
         if normalg <= converage:
             print("normalg <= converage!!!")
             break
+    print("w: ", )
+    return w
 
-    return normalg, w
 
-
-'''
+# def diff_lamda(x, y, lamda):
+    '''
     The regularization of different lamda values and fixed learning rate
     x:input dataset
     y:output dataset
     lamda:regularization factor
     rate:learning rat
-'''
-# def diff_lamda(x, y, lamda):
-    
-#     w = np.zeros(20)   #initial w
-#     rate =  #fixed rate
-#     converage=0.5
+    '''
+    w = np.zeros(20)   #initial w
+    rate =  #fixed rate
+    converage=0.5
 
-#     # gradient descent algorithm with different lamda
-#     lamda_array = [0.001, 0.01, 0.1, 0, 1, 10, 100]
-#     for lamda in lamda_array:
-#         for runs in range(1000000):
-#             E = grad(w, normalized_train_data, y_train_data, lamda)
-#             w = w - ( rate * E)
-#             if normalg <= converage:
-#                 break
+    # gradient descent algorithm with different lamda
+    lamda_array = [0.001, 0.01, 0.1, 0, 1, 10, 100]
+    for lamda in lamda_array:
+        for runs in range(1000000):
+            E = grad(w, normalized_train_data, y_train_data, lamda)
+            w = w - ( rate * E)
+            if normalg <= converage:
+                break
             
-#     return normalg, w
+    return normalg, w
 
+
+def test_y_value(w, x):
+    '''
+        This function is for finding y value for test. file
+        w: Best w value
+        x: test. file without price column
+        y: use y value from train data or validation data
+    '''
+
+    pred_y = np.array([])           #store pred_value
+
+    for i in x:
+        value = np.dot(w, i)    
+        pred_y = np.append(pred_y, value)
+
+    return pred_y
+
+
+def cross_comparison_dev(w, true_dev_y):
+    pred_dev_y = test_y_value(w, normalized_dev_data)
+    for (ea_true_dev_y, ea_pred_dev_y )in zip(true_dev_y, pred_dev_y):
+        difference_y = abs(true_dev_y - pred_dev_y)
+        sum_difference_y += difference_y
+        
+    print(sum_difference_y)
 
     
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
-    run_init_diff_learningrate()
+
+    grad_descent (normalized_train_data, y_train_data, learning)
+    plt.plot(normalg_list)
+    del normalg_list[:]
+
+    cross_comparison_dev( bill_input_w, y_dev_data)
+
+    test_y_value()
