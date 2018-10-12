@@ -299,9 +299,29 @@ def count_percentage(data, title):
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
     grad_descent(normalized_train_data, y_train_data, learning)
-    plt.plot(normalg_list)
-    plt.savefig(pwd+"/pic.png")
+    number = [0, 1, 3, 4, 5, 6, 7, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+    b = train[:1].T
+    a = train[1:].T
+    table = list()
+    for i in number: 
+        feature_name = b[i]   
+        float_value = a[i].astype(float)
+        max_value = np.max(float_value)
+        min_value = np.min(float_value)
+        mean_value = (sum(float_value))/10000
+        std_value = np.std(float_value)
+        # print('feature:', feature_name, 'max_value:', max_value, 'min_value:',  min_value, 'mean_value:', mean_value, 'std_value:', std_value )
+        tmp = [feature_name, max_value, min_value, mean_value, std_value]
+        table.append(tmp)
+    with open('table.csv', 'a', newline='') as csvfile:
+        
+        writer = csv.writer(csvfile)
+        writer.writerow(["feature", "max_value", "min_value", "mean_value", "std_value"])
+        writer.writerows(table)
+
+    # plt.plot(normalg_list)
+    # plt.savefig(pwd+"/pic.png")
     # plt.show()
-    del normalg_list[:]
+    # del normalg_list[:]
 
     # cross_comparison_dev( bill_input_w, y_dev_data)
