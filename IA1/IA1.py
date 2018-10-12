@@ -99,14 +99,14 @@ def process_columns():
         if ea_col == 2:
             date_data = split_date(cut_head_data, whichForm)
             for ea_date_data in date_data:
-                raw_train_data[:,count_col] = ea_date_data
+                raw_train_data[:,count_col] = ea_date_data.reshape((10000,))
                 add_in_arrays(count_col, ea_date_data, min_array, max_array)
                 norm_data(ea_col, count_col, ea_date_data, min_array, max_array, whichForm)
                 count_col += 1
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_train_data[:, 0] = cut_head_data
-            raw_train_data[:,0] = cut_head_data
+            raw_train_data[:,0] = cut_head_data.reshape((10000,))
             count_col += 1
         elif ea_col == 1:
             pass
@@ -115,7 +115,7 @@ def process_columns():
             y_train_data = cut_head_data
         else:
             cut_head_data = cut_head_data.astype(float)
-            raw_train_data[:,count_col] = cut_head_data
+            raw_train_data[:,count_col] = cut_head_data.reshape((10000,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
             count_col += 1
@@ -138,20 +138,20 @@ def process_columns():
         if ea_col == 2:
             date_data = split_date(cut_head_data, whichForm)
             for ea_date_data in date_data:
-                raw_test_data[:,count_col] = ea_date_data
+                raw_test_data[:,count_col] = ea_date_data.reshape((6000,))
                 add_in_arrays(count_col, ea_date_data, min_array, max_array)
                 norm_data(ea_col, count_col, ea_date_data, min_array, max_array, whichForm)
                 count_col += 1
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_test_data[:, 0] = cut_head_data
-            raw_test_data[:,0] = cut_head_data
+            raw_test_data[:,0] = cut_head_data.reshape((6000,))
             count_col += 1
         elif ea_col == 1:
             pass
         else:
             cut_head_data = cut_head_data.astype(float)
-            raw_test_data[:,count_col] = cut_head_data
+            raw_test_data[:,count_col] = cut_head_data.reshape((6000,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
             count_col += 1
@@ -176,14 +176,14 @@ def process_columns():
         if ea_col == 2:
             date_data = split_date(cut_head_data, whichForm)
             for ea_date_data in date_data:
-                raw_dev_data[:,count_col] = ea_date_data
+                raw_dev_data[:,count_col] = ea_date_data.reshape((5597,))
                 add_in_arrays(count_col, ea_date_data, min_array, max_array)
                 norm_data(ea_col, count_col, ea_date_data, min_array, max_array, whichForm)
                 count_col += 1
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_dev_data[:, 0] = cut_head_data
-            raw_dev_data[:,0] = cut_head_data
+            raw_dev_data[:,0] = cut_head_data.reshape((5597,))
             count_col += 1
         elif ea_col == 1:
             pass
@@ -192,7 +192,7 @@ def process_columns():
             y_dev_data = cut_head_data
         else:
             cut_head_data = cut_head_data.astype(float)
-            raw_dev_data[:,0] = cut_head_data
+            raw_dev_data[:,0] = cut_head_data.reshape((5597,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
             count_col += 1
