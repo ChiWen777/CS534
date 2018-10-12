@@ -6,7 +6,6 @@ import copy
 import matplotlib.pyplot as plt
 
 
-##part1
 pwd = os.getcwd()
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
 train = train.values
@@ -14,6 +13,7 @@ test = pd.read_csv('PA1_test.csv', sep=',',header=None)
 test = test.values
 dev = pd.read_csv('PA1_dev.csv', sep=',',header=None)
 dev = dev.values
+head_list = list()
 raw_train_data = np.zeros((10000, 22))  ## take out id and price 
 raw_test_data = np.zeros((6000, 22))  ## take out id 
 raw_dev_data = np.zeros((5597, 22))  ## take out id and price 
@@ -52,6 +52,8 @@ def add_in_arrays(count_col, data, min_array, max_array):
     """
     max_array[count_col] = np.max(data)
     min_array[count_col] = np.min(data)
+#     np.stdev(data)
+#     np.mean(data)
 
 def norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm):
     """
@@ -79,6 +81,8 @@ def process_columns():
     """
     Process both test.csv and train.csv 's columns and normalize them
     The final normalized data will store in normalized_train_data and normalized_test_data (without 'id' and 'price' columns )
+
+
     """
     
     count_col = 0
@@ -89,11 +93,11 @@ def process_columns():
     max_array = np.zeros((train.shape[1],))
 
     for ea_col in range(train.shape[1]):
-        
         orig_data = train[:,ea_col]
         
         cut_head_data = copy.deepcopy(orig_data)
         cut_head_data = cut_head_data[1:]
+        head_list.append(orig_data[:1])
         
         if ea_col == 2:
             date_data = split_date(cut_head_data, whichForm)
@@ -105,7 +109,7 @@ def process_columns():
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_train_data[:, 0] = cut_head_data
-            raw_train_data[:,0] = cut_head_data.reshape((10000,))
+            raw_train_data[:,0] = cut_head_data
             count_col += 1
         elif ea_col == 1:
             pass
@@ -117,7 +121,10 @@ def process_columns():
             raw_train_data[:,count_col] = cut_head_data.reshape((10000,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
+            if ea_col == 8 or ea_col == 10 or ea_col == 11:
+                count_percentage(cut_head_data, orig_data[:1])
             count_col += 1
+
 
     ##########################################################################
     
@@ -144,7 +151,7 @@ def process_columns():
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_test_data[:, 0] = cut_head_data
-            raw_test_data[:,0] = cut_head_data.reshape((6000,))
+            raw_test_data[:,0] = cut_head_data
             count_col += 1
         elif ea_col == 1:
             pass
@@ -153,6 +160,8 @@ def process_columns():
             raw_test_data[:,count_col] = cut_head_data.reshape((6000,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
+            if ea_col == 8 or ea_col == 10 or ea_col == 11:
+                count_percentage(cut_head_data, orig_data[:1])
             count_col += 1
 
 
@@ -182,7 +191,7 @@ def process_columns():
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_dev_data[:, 0] = cut_head_data
-            raw_dev_data[:,0] = cut_head_data.reshape((5597,))
+            raw_dev_data[:,0] = cut_head_data
             count_col += 1
         elif ea_col == 1:
             pass
@@ -194,6 +203,8 @@ def process_columns():
             raw_dev_data[:,0] = cut_head_data.reshape((5597,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
+            if ea_col == 8 or ea_col == 10 or ea_col == 11:
+                count_percentage(cut_head_data, orig_data[:1])
             count_col += 1
             
     return y_train_data, y_dev_data
@@ -272,7 +283,19 @@ def cross_comparison_dev(w, true_dev_y):
 
     print(sum_difference_y)
 
+
+def count_percentage(data, title):
+    print("Count percentage of examples for ",title," : ")
+    originalList = data.tolist()
+    total_len = len(originalList)
+    diff_num = set(originalList) 
+    fracs = list()
     
+    for ea_diff_num in diff_num:
+        fracs.append(100*originalList.count(ea_diff_num)/total_len)
+        print(ea_diff_num, ":  ",100*originalList.count(ea_diff_num)/total_len)
+    
+
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
     grad_descent(normalized_train_data, y_train_data, learning)
