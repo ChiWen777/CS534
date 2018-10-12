@@ -24,7 +24,7 @@ normalg_list = list()
 def run_init_diff_learningrate():
     #for ea_l in learning_list:
     # learning = ea_l
-    grad_descent (normalized_train_data, y_train_data, pow(10, -5))
+    diff_lamda(normalized_train_data, y_train_data, 1)
     plt.plot(normalg_list)
 
 
@@ -215,25 +215,25 @@ w: weight
 learning: learning rate
 converage: converage limit value
 """ 
-def grad_descent (x, y, learning):
+# def grad_descent (x, y, learning):
 
-    w = np.zeros(22)
-    converage=0.5
+#     w = np.zeros(22)
+#     converage=0.5
 
-    for runs in range(1000000):
-        gradient = grad(w, x, y, 0)
-        w = w - (learning * gradient)
-        normalg= np.linalg.norm(gradient)
-        print("normalg: ", normalg)
-        normalg_list.append(normalg)
-        # if runs % 100 == 0:
-        #     print ("w: ", w)
-        if normalg <= converage:
-            print("normalg <= converage!!!")
-            del normalg_list[:]
-            break
+#     for runs in range(1000000):
+#         gradient = grad(w, x, y, 0)
+#         w = w - (learning * gradient)
+#         normalg= np.linalg.norm(gradient)
+#         print("normalg: ", normalg)
+#         normalg_list.append(normalg)
+#         # if runs % 100 == 0:
+#         #     print ("w: ", w)
+#         if normalg <= converage:
+#             print("normalg <= converage!!!")
+#             del normalg_list[:]
+#             break
 
-    return normalg, w
+#     return normalg, w
 
 
 '''
@@ -243,22 +243,24 @@ def grad_descent (x, y, learning):
     lamda:regularization factor
     rate:learning rat
 '''
-# def diff_lamda(x, y, lamda):
+def diff_lamda(x, y, lamda):
     
-#     w = np.zeros(20)   #initial w
-#     rate =  #fixed rate
-#     converage=0.5
+    w = np.zeros(22)   #initial w
+    rate = 10**(-6) #fixed rate
+    converage=0.5
 
-#     # gradient descent algorithm with different lamda
-#     lamda_array = [0.001, 0.01, 0.1, 0, 1, 10, 100]
-#     for lamda in lamda_array:
-#         for runs in range(1000000):
-#             E = grad(w, normalized_train_data, y_train_data, lamda)
-#             w = w - ( rate * E)
-#             if normalg <= converage:
-#                 break
+    for runs in range(1000000):
+        E = grad(w, x, y, lamda)
+        w = w - ( rate * E)
+        normalg= np.linalg.norm(E)
+        print("normalg: ", normalg)
+        normalg_list.append(normalg)
+        if normalg <= converage:
+            print("normalg <= converage!!!")
+            del normalg_list[:]
+            break
             
-#     return normalg, w
+    return normalg, w
 
 
 '''
