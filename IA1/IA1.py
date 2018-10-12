@@ -234,6 +234,9 @@ def grad_descent (x, y, learning):
         gradient = grad(w, x, y, 0)
         w = w - (learning * gradient)
         normalg= np.linalg.norm(gradient)
+        if np.isinf(normalg):
+            print(normalg_list)
+            break
         # print("normalg: ", normalg)
         normalg_list.append(normalg)
         # if runs % 100 == 0:
@@ -300,8 +303,8 @@ if __name__ == "__main__":
 
     grad_descent (normalized_train_data, y_train_data, learning)
     plt.plot(normalg_list)
+    plt.show()
     del normalg_list[:]
 
     cross_comparison_dev( bill_input_w, y_dev_data)
 
-    test_y_value()
