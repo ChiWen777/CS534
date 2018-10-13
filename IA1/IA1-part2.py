@@ -5,6 +5,7 @@ import os
 import copy
 import matplotlib.pyplot as plt
 
+##part1
 
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
 train = train.values
@@ -21,8 +22,9 @@ normalized_dev_data = np.zeros((5597, 22))  ## take out id and price
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
 
-lamda = 100
-normalg_list = list()
+lamda = 10**(-2)
+sse_list = list()
+iteration_list = list()
 
 
 
@@ -207,10 +209,15 @@ def grad(w, x, y, lamda):
     """
 
     sum_up = 0
+    sum_sse = 0
     N = x.shape[0]      #we need to know how many data in each column(How many rows)
 
     for i in range(0, N):
-        sum_up = 2 * (np.dot(w, x[i]) - y[i]) * x[i] + 2 * lamda * w
+        sum_up += 2 * (np.dot(w, x[i]) - y[i]) * x[i] + 2 * lamda * w
+        sum_sse += ((np.dot(w, x[i]) - y[i]))**(2) + lamda * np.dot(w, w.T) 
+        sse_list.append(sum_sse)
+        print(sum_sse)
+
     return sum_up
 
 
@@ -224,22 +231,22 @@ def diff_lamda(x, y, lamda):
     '''
     
     w = np.zeros(22)   #initial w
-    rate = 10**(-3) #fixed rate
-    converage=0.5
+    rate = 10**(-5) #fixed rate
+    converage=300
 
     for runs in range(1000000):
         E = grad(w, x, y, lamda)
         w = w - ( rate * E)
         normalg= np.linalg.norm(E)
-        print("normalg: ", normalg)
         if np.isinf(normalg):
-            print(normalg_list)
+            print("normalg goes to inf, goning to break the loop.")
             break
-        normalg_list.append(normalg)
         if normalg <= converage:
             print("normalg <= converage!!!")
             break
+        iteration_list.append(runs)
     print("w: ", w)        
+    print("i: ", runs)
     return w
 
 
@@ -249,8 +256,9 @@ def diff_lamda(x, y, lamda):
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
     diff_lamda(normalized_train_data, y_train_data, lamda)
-    plt.plot(normalg_list)
-    plt.show()
-    del normalg_list[:]
+    plt.plot(sse_list, iteration_list)
+    plt.ylabel("Number of iteration")
+    plt.xlabel("SSE")
+    plt.savefig(pwd+"train_part2-10^-9.png")
 
     
