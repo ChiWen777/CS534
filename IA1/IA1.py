@@ -6,6 +6,7 @@ import copy
 import matplotlib.pyplot as plt
 
 
+##part1
 pwd = os.getcwd()
 train = pd.read_csv('PA1_train.csv', sep=',',header=None)
 train = train.values
@@ -13,7 +14,6 @@ test = pd.read_csv('PA1_test.csv', sep=',',header=None)
 test = test.values
 dev = pd.read_csv('PA1_dev.csv', sep=',',header=None)
 dev = dev.values
-head_list = list()
 raw_train_data = np.zeros((10000, 22))  ## take out id and price 
 raw_test_data = np.zeros((6000, 22))  ## take out id 
 raw_dev_data = np.zeros((5597, 22))  ## take out id and price 
@@ -24,7 +24,7 @@ y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
 # learning_list = [pow(10, 0),pow(10, -1),pow(10, -2),pow(10, -3),pow(10, -4),pow(10, -5),pow(10, -6),pow(10, -7)]
 
-learning = pow(10, -1)
+learning = pow(10, -5)
 normalg_list = list()
 
 
@@ -52,8 +52,6 @@ def add_in_arrays(count_col, data, min_array, max_array):
     """
     max_array[count_col] = np.max(data)
     min_array[count_col] = np.min(data)
-#     np.stdev(data)
-#     np.mean(data)
 
 def norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm):
     """
@@ -81,8 +79,6 @@ def process_columns():
     """
     Process both test.csv and train.csv 's columns and normalize them
     The final normalized data will store in normalized_train_data and normalized_test_data (without 'id' and 'price' columns )
-
-
     """
     
     count_col = 0
@@ -93,11 +89,11 @@ def process_columns():
     max_array = np.zeros((train.shape[1],))
 
     for ea_col in range(train.shape[1]):
+        
         orig_data = train[:,ea_col]
         
         cut_head_data = copy.deepcopy(orig_data)
         cut_head_data = cut_head_data[1:]
-        head_list.append(orig_data[:1])
         
         if ea_col == 2:
             date_data = split_date(cut_head_data, whichForm)
@@ -109,7 +105,7 @@ def process_columns():
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_train_data[:, 0] = cut_head_data
-            raw_train_data[:,0] = cut_head_data
+            raw_train_data[:,0] = cut_head_data.reshape((10000,))
             count_col += 1
         elif ea_col == 1:
             pass
@@ -121,10 +117,7 @@ def process_columns():
             raw_train_data[:,count_col] = cut_head_data.reshape((10000,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
-            if ea_col == 8 or ea_col == 10 or ea_col == 11:
-                count_percentage(cut_head_data, orig_data[:1])
             count_col += 1
-
 
     ##########################################################################
     
@@ -151,7 +144,7 @@ def process_columns():
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_test_data[:, 0] = cut_head_data
-            raw_test_data[:,0] = cut_head_data
+            raw_test_data[:,0] = cut_head_data.reshape((6000,))
             count_col += 1
         elif ea_col == 1:
             pass
@@ -160,8 +153,6 @@ def process_columns():
             raw_test_data[:,count_col] = cut_head_data.reshape((6000,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
-            if ea_col == 8 or ea_col == 10 or ea_col == 11:
-                count_percentage(cut_head_data, orig_data[:1])
             count_col += 1
 
 
@@ -191,7 +182,7 @@ def process_columns():
         elif ea_col == 0:
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             normalized_dev_data[:, 0] = cut_head_data
-            raw_dev_data[:,0] = cut_head_data
+            raw_dev_data[:,0] = cut_head_data.reshape((5597,))
             count_col += 1
         elif ea_col == 1:
             pass
@@ -203,8 +194,6 @@ def process_columns():
             raw_dev_data[:,0] = cut_head_data.reshape((5597,))
             add_in_arrays(count_col, cut_head_data, min_array, max_array)
             norm_data(ea_col, count_col, cut_head_data, min_array, max_array, whichForm)
-            if ea_col == 8 or ea_col == 10 or ea_col == 11:
-                count_percentage(cut_head_data, orig_data[:1])
             count_col += 1
             
     return y_train_data, y_dev_data
@@ -219,12 +208,15 @@ def grad(w, x, y, lamda):
     y:output dataset
     lamda:regularization factor
     """
-
+    sse = 0
     sum_up = 0
     N = x.shape[0]      #we need to know how many data in each column(How many rows)
 
     for i in range(0, N):
+        sse += (y[i] - np.dot(w, x[i]))**(2)
         sum_up += 2 * (np.dot(w, x[i]) - y[i]) * x[i] + 2 * lamda * w
+    print("sse:",sse)
+    normalg_list.append(sse)
     return sum_up
 
 
@@ -237,22 +229,24 @@ def grad_descent (x, y, learning):
     """ 
 
     w = np.zeros(22)
-    converage=0.5
-
+    converage=40
+    i=0
     for runs in range(1000000):
+        i=i+1
         gradient = grad(w, x, y, 0)
         w = w - (learning * gradient)
         normalg= np.linalg.norm(gradient)
         print("normalg: ", normalg)
+        #print("gradient: ", gradient)
         if np.isinf(normalg):
             print(normalg_list)
             break
-        normalg_list.append(normalg)
-        # if runs % 100 == 0:
-        #     print ("w: ", w)
+        #normalg_list.append(gradient)
         if normalg <= converage:
             print("normalg <= converage!!!")
             break
+  
+    print("total run: ",i)
     print("w: ",w )
     return w
 
@@ -280,48 +274,16 @@ def cross_comparison_dev(w, true_dev_y):
     for (ea_true_dev_y, ea_pred_dev_y )in zip(true_dev_y, pred_dev_y):
         difference_y = abs(ea_true_dev_y - ea_pred_dev_y)
         sum_difference_y += difference_y
-    print("cross_comparison_dev: ")
+
     print(sum_difference_y)
 
-
-def count_percentage(data, title):
-    print("Count percentage of examples for ",title," : ")
-    originalList = data.tolist()
-    total_len = len(originalList)
-    diff_num = set(originalList) 
-    fracs = list()
     
-    for ea_diff_num in diff_num:
-        fracs.append(100*originalList.count(ea_diff_num)/total_len)
-        print(ea_diff_num, ":  ",100*originalList.count(ea_diff_num)/total_len)
-    
-
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
     grad_descent(normalized_train_data, y_train_data, learning)
-    number = [0, 1, 3, 4, 5, 6, 7, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-    b = train[:1].T
-    a = train[1:].T
-    table = list()
-    for i in number: 
-        feature_name = b[i]   
-        float_value = a[i].astype(float)
-        max_value = np.max(float_value)
-        min_value = np.min(float_value)
-        mean_value = (sum(float_value))/10000
-        std_value = np.std(float_value)
-        # print('feature:', feature_name, 'max_value:', max_value, 'min_value:',  min_value, 'mean_value:', mean_value, 'std_value:', std_value )
-        tmp = [feature_name, max_value, min_value, mean_value, std_value]
-        table.append(tmp)
-    with open('table.csv', 'a', newline='') as csvfile:
-        
-        writer = csv.writer(csvfile)
-        writer.writerow(["feature", "max_value", "min_value", "mean_value", "std_value"])
-        writer.writerows(table)
-
-    # plt.plot(normalg_list)
-    # plt.savefig(pwd+"/pic.png")
+    plt.plot(normalg_list)
+    plt.savefig(pwd+"/pic.png")
     # plt.show()
-    # del normalg_list[:]
+    del normalg_list[:]
 
     # cross_comparison_dev( bill_input_w, y_dev_data)
