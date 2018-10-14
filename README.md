@@ -6,7 +6,7 @@
    python3.5 IA1.py
      in this program file includes two function:
      --grad_descent(normalized_train_data, y_train_data, learning)
-     this function generates the weight matix
+     this function generates the weight matrix
      --predict_test_y()
      this function to predict the test y value by using the weight we found
 3. for running part2 program
