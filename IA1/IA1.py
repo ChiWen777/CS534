@@ -23,7 +23,7 @@ normalized_dev_data = np.zeros((5597, 22))  ## take out id and price
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
 # learning_list = [pow(10, 0),pow(10, -1),pow(10, -2),pow(10, -3),pow(10, -4),pow(10, -5),pow(10, -6),pow(10, -7)]
-
+lamda = 0.001
 learning = pow(10, -1)
 normalg_list = list()
 
@@ -240,7 +240,7 @@ def grad_descent (x, y, learning):
     converage=0.5
 
     for runs in range(1000000):
-        gradient = grad(w, x, y, 0)
+        gradient = grad(w, x, y, lamda)
         w = w - (learning * gradient)
         normalg= np.linalg.norm(gradient)
         print("normalg: ", normalg)
@@ -283,6 +283,16 @@ def cross_comparison_dev(w, true_dev_y):
     print("cross_comparison_dev: ")
     print(sum_difference_y)
 
+def predict_test_y():
+    w = [-1.86290481,0.1075248,-0.38702919,-0.13091035,-0.31506836,4.05686198,4.88834682,0.15583834,0.69730991,3.60116205,2.40249443,0.70713441,7.44499907,5.52841333,2.99076192,-2.74338666,0.65187757,-1.08878388,3.77410322,-1.970244,4.60586131,-0.19908633]
+    pred_test_y = test_y_value(w, normalized_test_data)
+    pty = pred_test_y.tolist()
+    print(pty)
+    with open('new_predict_test_y.csv', 'a', newline='') as csvfile:
+        
+        writer = csv.writer(csvfile)
+        writer.writerow(pty)
+
 
 def count_percentage(data, title):
     print("Count percentage of examples for ",title," : ")
@@ -290,38 +300,56 @@ def count_percentage(data, title):
     total_len = len(originalList)
     diff_num = set(originalList) 
     fracs = list()
-    
+    # tmp_table = list()
+    with open('count_percentage.csv', 'a', newline='') as csvfile:
+        
+        writer = csv.writer(csvfile)
+        writer.writerow([title])
+
+
     for ea_diff_num in diff_num:
+
+        fracs.append(ea_diff_num)
         fracs.append(100*originalList.count(ea_diff_num)/total_len)
         print(ea_diff_num, ":  ",100*originalList.count(ea_diff_num)/total_len)
+
+        with open('count_percentage.csv', 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(fracs)
+
+        del fracs[:]
+        
+
+
     
 
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
     grad_descent(normalized_train_data, y_train_data, learning)
-    number = [0, 1, 3, 4, 5, 6, 7, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-    b = train[:1].T
-    a = train[1:].T
-    table = list()
-    for i in number: 
-        feature_name = b[i]   
-        float_value = a[i].astype(float)
-        max_value = np.max(float_value)
-        min_value = np.min(float_value)
-        mean_value = (sum(float_value))/10000
-        std_value = np.std(float_value)
-        # print('feature:', feature_name, 'max_value:', max_value, 'min_value:',  min_value, 'mean_value:', mean_value, 'std_value:', std_value )
-        tmp = [feature_name, max_value, min_value, mean_value, std_value]
-        table.append(tmp)
-    with open('table.csv', 'a', newline='') as csvfile:
+    predict_test_y()
+
+    # number = [0, 1, 3, 4, 5, 6, 7, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+    # b = train[:1].T
+    # a = train[1:].T
+    # table = list()
+    # for i in number: 
+    #     feature_name = b[i]   
+    #     float_value = a[i].astype(float)
+    #     max_value = np.max(float_value)
+    #     min_value = np.min(float_value)
+    #     mean_value = (sum(float_value))/10000
+    #     std_value = np.std(float_value)
+    #     # print('feature:', feature_name, 'max_value:', max_value, 'min_value:',  min_value, 'mean_value:', mean_value, 'std_value:', std_value )
+    #     tmp = [feature_name, max_value, min_value, mean_value, std_value]
+    #     table.append(tmp)
+    # with open('range_table.csv', 'a', newline='') as csvfile:
         
-        writer = csv.writer(csvfile)
-        writer.writerow(["feature", "max_value", "min_value", "mean_value", "std_value"])
-        writer.writerows(table)
+    #     writer = csv.writer(csvfile)
+    #     writer.writerow(["feature", "max_value", "min_value", "mean_value", "std_value"])
+    #     writer.writerows(table)
 
     # plt.plot(normalg_list)
     # plt.savefig(pwd+"/pic.png")
     # plt.show()
     # del normalg_list[:]
-
-    # cross_comparison_dev( bill_input_w, y_dev_data)
+    # w = [0.7929263,0.24809381,0.19291893,0.13768568,0.86682762,1.22872843,1.1341017,0.08855074,0.90892737,0.580687,1.44196388,0.64715359,1.9693417,1.2604114,0.73537896,0.2428598,0.685939,-0.04664689,1.9124737,0.12728947,1.6342164,0.11902113]

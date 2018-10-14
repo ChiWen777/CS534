@@ -216,7 +216,7 @@ def grad(w, x, y, lamda):
         sum_up += 2 * (np.dot(w, x[i]) - y[i]) * x[i] 
         sum_sse = (((np.dot(w, x[i]) - y[i]))**(2)) + sum_sse
         sse_list.append(sum_sse)
-
+    print(sum_sse)
     sum_up += 2 * lamda * w
     return sum_up
 
