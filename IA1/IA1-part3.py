@@ -23,7 +23,7 @@ normalized_dev_data = np.zeros((5597, 22))  ## take out id and price
 y_train_data = np.zeros((10000, ))
 y_dev_data = np.zeros((5597, ))
 
-learning = pow(10, -9)
+learning = pow(10, 0)
 sse_list = list()
 iteration_list = list()
 
@@ -217,7 +217,7 @@ def grad(w, x, y, lamda):
         sum_sse = (((np.dot(w, x[i]) - y[i]))**(2)) + sum_sse
         sse_list.append(sum_sse)
     print(sum_sse)
-    sum_up += 2 * lamda * w
+    
     return sum_up
 
 
@@ -261,5 +261,3 @@ if __name__ == "__main__":
     plt.ylabel("Number of iteration")
     plt.xlabel("SSE")
     plt.savefig(pwd+"dev_part3-10^-9.png")
-    
-
