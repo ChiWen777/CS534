@@ -1,4 +1,4 @@
-dummy,id,date,bedrooms,bathrooms,sqft_living,sqft_lot,floors,waterfront,view,condition,grade,sqft_above,sqft_basement,yr_built,yr_renovated,zipcode,lat,long,sqft_living15,sqft_lot15,price
+dummy,id,date,bedrooms,bathrooms,sqft_living,sqft_lot,floors,waterfront,view,condition,grade,sqft_above,sqft_basement,yr_built,yr_renovated,zipcode,lat,long,sqft_living15,sqft_lot15,predict_price
 1,4193500140,9/11/14,3,1.75,1800,8000,1,0,0,3,8,1800,0,1972,0,98008,47.6357,-122.119,1950,8500,5.454029045
 1,1732800184,5/8/14,2,1.5,1110,957,2,0,0,3,8,930,180,2005,0,98119,47.6319,-122.362,1680,1104,3.812874768
 1,1545800290,4/8/15,4,2.5,1700,6675,2,0,0,3,7,1700,0,1997,0,98038,47.3638,-122.053,1570,7540,2.609882565

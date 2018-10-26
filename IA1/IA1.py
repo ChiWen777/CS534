@@ -321,7 +321,13 @@ def count_percentage(data, title):
 if __name__ == "__main__":
     y_train_data, y_dev_data = process_columns()
     grad_descent(normalized_train_data, y_train_data, learning)
+
+    # predict price 
     predict_test_y()
+
+    #cross comparison to get difference_y
+    #cross_comparison_dev(input_w, y_dev_data)
+
 
     # number = [0, 1, 3, 4, 5, 6, 7, 9, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
     # b = train[:1].T
