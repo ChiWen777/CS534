@@ -124,10 +124,3 @@ test_x_array = test_x_data('pa2_test_no_label.csv')
 
 
 Avg_Perceptron(x_array, y_array, v_x_array, v_y_array)
-
-
-# print("====train====")
-# w = np.zeros(x_array.shape[1])
-# w_from_train = Avg_Perceptron(x_array, y_array, w)
-# print("====valid====")
-# w = Avg_Perceptron(v_x_array, v_y_array, w_from_train)
