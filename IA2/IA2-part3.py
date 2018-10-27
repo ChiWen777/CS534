@@ -1,6 +1,5 @@
 import numpy as np
 from math import log
-import matplotlib.pyplot as plt
 import csv
 import math
 import copy
@@ -68,6 +67,7 @@ def x_data_test(filename):
 def Kernel_Perceptron_Train(x, y):
 	'''
 		X = N*F, a = N*1, y = N*1 
+		This function is for caculating alpha from train.csv
 	'''
 	N = x.shape[0]					#4888
 	a = np.zeros(x.shape[0])		
@@ -94,53 +94,56 @@ def Kernel_Perceptron_Train(x, y):
 
 
 #############Kernel Perceptron for validation##############
-# def Kernel_Perceptron_Valid(x, y, x_v, y_v):
-# 	'''
-# 	'''
-# 	a = np.array(Kernel_Perceptron_Train(x_array_train, y_array_train)) 		# Train data's a
-# 	N = x_v.shape[0]			#i
-# 	N1 = x.shape[0]				#j
-
-
-# 	for it in range(0,15):
-# 		count = 0
-# 		c = a[it]
-# 		for i  in range(0, N): 
-# 			u = 0
-# 			for j in range(0, N1):
-# 				kp = (1 + np.dot(x[j], x_v[i].T)) ** p
-# 				u = u + kp* c[j]*y[j] 
-# 			if y_v[i]*u <= 0:
-# 				count += 1
-# 		accuracy = 1 - (count/N)
-# 		print("validation:", accuracy)
-# 	return u
-
-
-
-
-#####################Test Perceptron###################
-def Test_Perceptron(x, y, x_t):
+def Kernel_Perceptron_Valid(x, y, x_v, y_v):
 	'''
-		The best result is at p = 3 , iter = 4
+		
+		This function is for caculating accuracy and find alpha from valid.csv
 	'''
 	a = np.array(Kernel_Perceptron_Train(x_array_train, y_array_train)) 		# Train data's a
-	N = x_t.shape[0]			#i 
+	N = x_v.shape[0]			#i
 	N1 = x.shape[0]				#j
 
 
 	for it in range(0,15):
 		count = 0
-		c = a[3]
+		c = a[it]
 		for i  in range(0, N): 
 			u = 0
 			for j in range(0, N1):
-				kp = (1 + np.dot(x[j], x_t[i].T)) ** 3
-				u = np.sign(u + kp* c[j]*y[j])
-			print("u:", u)
-
-
+				kp = (1 + np.dot(x[j], x_v[i].T)) ** p
+				u = u + kp* c[j]*y[j] 
+			if y_v[i]*u <= 0:
+				count += 1
+		accuracy = 1 - (count/N)
+		print("validation:", accuracy)
 	return u
+
+
+
+
+#####################Test Perceptron###################
+# def Test_Perceptron(x, y, x_t):
+# 	'''
+# 		The best result is at p = 3 , iter = 4
+# 		This function is for test y value in test.csv
+# 	'''
+# 	a = np.array(Kernel_Perceptron_Train(x_array_train, y_array_train)) 		# Train data's a
+# 	N = x_t.shape[0]			#i 
+# 	N1 = x.shape[0]				#j
+# 	c = a[3]					#iter = 4
+# 	u_list = list()
+
+	
+
+# 	for i in range(0, N): 
+# 		u = 0
+# 		for j in range(0, N1):
+# 			kp = (1 + np.dot(x[j], x_t[i].T)) ** 3
+# 			u = u + kp* c[j]*y[j]
+# 		print("u:", np.sign(u))
+# 		u_list.append(np.sign(u))
+
+# 	return u_list
 
 
 
@@ -158,9 +161,20 @@ x_array_valid = x_data('pa2_valid.csv')
 #test.csv
 x_array_test = x_data_test('pa2_test_no_label.csv')
 
-
 # Kernel_Perceptron_Train(x_array_train, y_array_train)
-# Kernel_Perceptron_Valid(x_array_train, y_array_train, x_array_valid, y_array_valid)
-Test_Perceptron(x_array_train, y_array_train, x_array_test)
+
+# Accuracy
+Kernel_Perceptron_Valid(x_array_train, y_array_train, x_array_valid, y_array_valid)
+
+# Output test value
+# pred_y = Test_Perceptron(x_array_train, y_array_train, x_array_test)
+
+rows = len(pred_y)
+with open('kplabel.csv', 'a', newline='') as csvfile:
+        
+        writer = csv.writer(csvfile)
+        for i in range(0, rows):
+            writer.writerow([pred_y[i]])
+
 
 

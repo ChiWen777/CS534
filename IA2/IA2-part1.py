@@ -62,7 +62,7 @@ def test_x_data(filename):
 #############Perceptron_Train##############
 def Perceptron_Train(x, y):
 	'''
-		
+		This function is for caculating accuracy for train.csv
 	'''
 	w = np.zeros(len(x[0]))		#number of values in Train.csv 
 	it = 1					#iterate
@@ -92,7 +92,7 @@ def Perceptron_Train(x, y):
 ###########Perceptron_Validation################
 def Perceptron_Validation(x, y, x_v, y_v, iter):
 	'''
-
+		This function is for caculating accuracy for valid.csv
 	'''
 	a = np.array(Perceptron_Train(x, y)) #w
 	N = x_v.shape[0]
