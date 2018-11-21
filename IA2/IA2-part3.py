@@ -5,7 +5,7 @@ import math
 import copy
 
 #Set p value (1,2,3,7,15)
-p = 3
+p = 1
 print(p)
 
 ##########Read File###########
