@@ -3,6 +3,7 @@ from math import log
 import matplotlib.pyplot as plt
 import csv
 import math
+import operator
 
 
 ##########Read File###########
@@ -38,7 +39,21 @@ def x_data(filename):
 			tmp.append(float(x.strip()))		
 		add_x.append(tmp[1:])
 	x_to_array = np.array(add_x)			# x list convert to x array
+	# x_to_array = add_x
+	return x_to_array
 
+
+############get each feature##################
+def x_feature(filename):
+	'''
+	'''
+	file = open(filename , 'r')
+	add_x = []
+	a = csv.reader(file)
+	for row in a : 
+		add_x.append(float(row[1]))
+	# y_to_array = np.array(y)
+	x_to_array = add_x
 	return x_to_array
 
 
@@ -53,8 +68,18 @@ def root_u(y):
 
 
 ############Compute U value###################
-def compute_u(x, y):
-	return 1
+def compute_u(x_feature, y, n=10):
+	y_value = []
+	d = dict(zip(x_feature, y))
+	sorted_feature = sorted(d.items(), key= lambda d: d[0])
+	
+	for i in range(0, n):
+		y_value.append(sorted_feature[i][1])
+	
+	print(y_value.count(1))
+	return sorted_feature
+
+
 
 # def Split_samples(self, x_to_array, feature):
 # 	'''
@@ -126,13 +151,15 @@ def compute_u(x, y):
 #train.csv
 y_array_train = y_data('pa3_train_reduced.csv')
 x_array_train = x_data('pa3_train_reduced.csv')
+x_feature = x_feature('pa3_train_reduced.csv')
 #valid.csv
 y_array_valid = y_data('pa3_valid_reduced.csv')
 x_array_valid = x_data('pa3_valid_reduced.csv')
 
-print(root_u(y_array_train))
+# print(type(y_array_train))
+# print(compute_u(x_feature, y_array_train))
+compute_u(x_feature, y_array_train)
 
-print(x_array_train)
 # print(x_feature(x_array_train, 1))			#1 is feature
 
 
