@@ -23,8 +23,8 @@ def y_data(filename):
 			y.append(float(1))
 		else:
 			y.append(float(-1))
-	# y_to_array = np.array(y)
-	y_to_array = y
+	y_to_array = np.array(y)
+	# y_to_array = y
 	return y_to_array
 
 def x_data(filename):
@@ -39,22 +39,17 @@ def x_data(filename):
 			tmp.append(float(x.strip()))		
 		add_x.append(tmp[1:])
 	x_to_array = np.array(add_x)			# x list convert to x array
-	# x_to_array = add_x
+	
 	return x_to_array
 
 
 ############get each feature##################
-def x_feature(filename):
+def x_feature(x):
 	'''
 	'''
-	file = open(filename , 'r')
-	add_x = []
-	a = csv.reader(file)
-	for row in a : 
-		add_x.append(float(row[1]))
-	# y_to_array = np.array(y)
-	x_to_array = add_x
-	return x_to_array
+	x_T = x.T 
+
+	return x_T
 
 
 ############Root U Value######################
@@ -67,17 +62,43 @@ def root_u(y):
 
 
 
-############Compute U value###################
-def compute_u(x_feature, y, n=10):
-	y_value = []
-	d = dict(zip(x_feature, y))
-	sorted_feature = sorted(d.items(), key= lambda d: d[0])
-	
-	for i in range(0, n):
-		y_value.append(sorted_feature[i][1])
-	
-	print(y_value.count(1))
-	return sorted_feature
+############Split data###################
+def split_data(y_index, t, t_index):
+	'''
+		y_index: list
+		t : int (theta)
+		t_index: [x, y]
+		y: original y
+	'''
+
+	a = x_feature(x_array_train) 
+	y = y_array_train
+	x = a[t_index[1]]					#which column
+	x_value = x[y_index]				#x's value(which row)
+	y_value = y[y_index]				#y's value(which row)
+	# for i in range(0, len(y_index)):
+
+
+	right_index, left_index = [], []
+	left_y, right_y = {}, {}
+
+	####split data######
+	for v in range(0, len(y_index)):
+		if x_value[v] >= t:
+			right_index.append(y_index[v])
+			right_y[v] = y_value[v]
+		else:
+			left_index.append(y_index[v])
+			left_y[v] = y_value[v]
+
+
+	right_y_value = right_y.values()
+	left_y_value = left_y.values()
+	count_right_pos = list(right_y_value).count(1)
+	count_right_neg = list(right_y_value).count(-1)
+	count_left_pos = list(left_y_value).count(1)
+	count_left_neg = list(left_y_value).count(-1)
+	return count_left_neg,count_left_pos,count_right_neg, count_right_pos, right_index, left_index
 
 
 
@@ -151,16 +172,10 @@ def compute_u(x_feature, y, n=10):
 #train.csv
 y_array_train = y_data('pa3_train_reduced.csv')
 x_array_train = x_data('pa3_train_reduced.csv')
-x_feature = x_feature('pa3_train_reduced.csv')
 #valid.csv
 y_array_valid = y_data('pa3_valid_reduced.csv')
 x_array_valid = x_data('pa3_valid_reduced.csv')
 
-# print(type(y_array_train))
-# print(compute_u(x_feature, y_array_train))
-compute_u(x_feature, y_array_train)
-
-# print(x_feature(x_array_train, 1))			#1 is feature
-
+print(split_data([1,2,3], 268, [1,4]))
 
 
