@@ -47,8 +47,7 @@ def x_data(filename):
 def x_feature(x):
 	'''
 	'''
-	x_T = x.T 
-
+	x_T = x.T
 	return x_T
 
 
@@ -76,7 +75,6 @@ def split_data(y_index, t, t_index):
 	x = a[t_index[1]]					#which column
 	x_value = x[y_index]				#x's value(which row)
 	y_value = y[y_index]				#y's value(which row)
-	# for i in range(0, len(y_index)):
 
 
 	right_index, left_index = [], []
@@ -176,6 +174,13 @@ x_array_train = x_data('pa3_train_reduced.csv')
 y_array_valid = y_data('pa3_valid_reduced.csv')
 x_array_valid = x_data('pa3_valid_reduced.csv')
 
-print(split_data([1,2,3], 268, [1,4]))
+# print(list(y_array_train).count(1))
 
 
+dic = list(range(0, 4888))
+com = list(zip(y_array_train, x_array_train))
+dic_data = dict(zip(dic, com))
+dic_v = list(dic_data.values())
+a = list(com[0])
+b = list(a[1])
+print(b[3])
