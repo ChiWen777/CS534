@@ -7,6 +7,27 @@ import operator
 
 
 ##########Read File###########
+def original_data(filename):
+	file = open(filename , 'r')
+	add_o = []
+	total = []
+	for row in file:
+		tmp = []						#each row creates a list
+		for x in row.split(','):		
+			tmp.append(float(x.strip()))		
+		add_o.append(tmp)
+	a = np.array(add_o)
+	for x_v in a:
+		str_xv = str(x_v[0])
+		if str_xv == '5.0':
+			p_str = str_xv.replace('5.0', '-1')
+			x_v[0] = float(p_str)
+		else:
+			n_str = str_xv.replace('3.0', '1')
+			x_v[0] = float(n_str)
+		total.append(x_v)
+	return total
+
 def y_data(filename):
 	'''
 		This function is for adding y value in list
@@ -88,60 +109,51 @@ def split_data(y_index, t, t_index):
 
 
 
-############get each feature##################
-def x_feature(x):
-	'''
-	'''
-	x_T = x.T 
+# ############Root U Value######################
+# def U_value(neg,pos):
 
-	return x_T
+# 	u = 1 - pow((pos/(pos+neg)), 2) - pow((neg/(pos+neg)), 2)
+# 	return u 
 
 
-############Root U Value######################
-def U_value(neg,pos):
+# def B_value(theda, left_neg,left_pos, right_pos, right_neg, U_root):
+# 	# right_pos, right_neg, legt_pos, left_neg = count_neg_pos(theda, y_array, x_array)
+# 	pb_l= (left_pos+left_neg)/(right_pos+right_neg+left_pos+left_neg)
+# 	pb_r= (right_pos+right_neg)/(right_pos+right_neg+left_pos+left_neg)
+# 	B_value = U_root - pb_l*U_value(left_neg,left_pos) - pb_r*U_value(right_neg,right_pos)
+# 	return B_value
 
-	u = 1 - pow((pos/(pos+neg)), 2) - pow((neg/(pos+neg)), 2)
-	return u 
-
-
-def B_value(theda, left_neg,left_pos, right_pos, right_neg, U_root):
-	# right_pos, right_neg, legt_pos, left_neg = count_neg_pos(theda, y_array, x_array)
-	pb_l= (left_pos+left_neg)/(right_pos+right_neg+left_pos+left_neg)
-	pb_r= (right_pos+right_neg)/(right_pos+right_neg+left_pos+left_neg)
-	B_value = U_root - pb_l*U_value(left_neg,left_pos) - pb_r*U_value(right_neg,right_pos)
-	return B_value
-
-def best_B(index,x_array, neg, pos):
-	U_root = U_value(neg, pos)
-	# print(U_root)
-	best_b = 0
-	index_pos = []
-	index_neg = []
-	theda_index= [0,0]
-	a = index
-	b = 
-	c = 
-	for i in index:  
-		for j in range(0,100):
-			theda = x_array[i][j]
-			# print(x_array[i][j])
-			temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos, temp_index_right, temp_index_left = split_data(index ,theda ,[i,j])
-			# print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos, temp_index_right, temp_index_left)
-			if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
-				temp_b=0
-			else:
-				temp_b = B_value(theda,temp_left_neg, temp_left_pos, temp_right_pos, temp_right_neg, U_root )
-			if temp_b > best_b:
-				theda = x_array[i][j]
-				left_pos = temp_left_pos
-				left_neg = temp_left_neg
-				right_neg = temp_right_neg
-				right_pos = temp_right_pos
-				best_b = temp_b
-				index_left = temp_index_left
-				index_right = temp_index_right
-	# print(theda, left_neg, left_pos, right_neg, right_pos, index_left, index_right)
-	return theda, left_neg, left_pos, right_neg, right_pos, index_left, index_right
+# def best_B(index,x_array, neg, pos):
+# 	U_root = U_value(neg, pos)
+# 	# print(U_root)
+# 	best_b = 0
+# 	index_pos = []
+# 	index_neg = []
+# 	theda_index= [0,0]
+# 	a = index
+# 	b = 
+# 	c = 
+# 	for i in index:  
+# 		for j in range(0,100):
+# 			theda = x_array[i][j]
+# 			# print(x_array[i][j])
+# 			temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos, temp_index_right, temp_index_left = split_data(index ,theda ,[i,j])
+# 			# print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos, temp_index_right, temp_index_left)
+# 			if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
+# 				temp_b=0
+# 			else:
+# 				temp_b = B_value(theda,temp_left_neg, temp_left_pos, temp_right_pos, temp_right_neg, U_root )
+# 			if temp_b > best_b:
+# 				theda = x_array[i][j]
+# 				left_pos = temp_left_pos
+# 				left_neg = temp_left_neg
+# 				right_neg = temp_right_neg
+# 				right_pos = temp_right_pos
+# 				best_b = temp_b
+# 				index_left = temp_index_left
+# 				index_right = temp_index_right
+# 	# print(theda, left_neg, left_pos, right_neg, right_pos, index_left, index_right)
+# 	return theda, left_neg, left_pos, right_neg, right_pos, index_left, index_right
 
 
 
@@ -223,17 +235,15 @@ def best_B(index,x_array, neg, pos):
 #train.csv
 y_array_train = y_data('pa3_train_reduced.csv')
 x_array_train = x_data('pa3_train_reduced.csv')
+total_train = original_data('pa3_train_reduced.csv')
 #valid.csv
 y_array_valid = y_data('pa3_valid_reduced.csv')
 x_array_valid = x_data('pa3_valid_reduced.csv')
 
-# print(list(y_array_train).count(1))
-
 
 dic = list(range(0, 4888))
-com = list(zip(y_array_train, x_array_train))
-dic_data = dict(zip(dic, com))
-dic_v = list(dic_data.values())
-a = list(com[0])
-b = list(a[1])
-print(b[3])
+
+dic_data = dict(zip(dic, total_train))
+values = list(dic_data.values())
+print(values[0][1])
+
