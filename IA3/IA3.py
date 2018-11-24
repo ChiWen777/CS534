@@ -1,6 +1,6 @@
 import numpy as np
 from math import log
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import csv
 import math
 import operator
@@ -42,7 +42,6 @@ def x_data(filename):
 	
 	return x_to_array
 
-
 ############get each feature##################
 def x_feature(x):
 	'''
@@ -50,24 +49,13 @@ def x_feature(x):
 	x_T = x.T
 	return x_T
 
-
-############Root U Value######################
-def root_u(y):
-	pos = y.count(1)
-	nag = y.count(-1)
-	u = 1 - pow((pos/(pos+nag)), 2) - pow((nag/(pos+nag)), 2)
-	return u 
-
-
-
-
 ############Split data###################
 def split_data(y_index, t, t_index):
 	'''
-		y_index: list
-		t : int (theta)
-		t_index: [x, y]
-		y: original y
+	y_index: list
+	t : int (theta)
+	t_index: [x, y]
+	y: original y
 	'''
 
 	a = x_feature(x_array_train) 
@@ -80,7 +68,7 @@ def split_data(y_index, t, t_index):
 	right_index, left_index = [], []
 	left_y, right_y = {}, {}
 
-	####split data######
+####split data######
 	for v in range(0, len(y_index)):
 		if x_value[v] >= t:
 			right_index.append(y_index[v])
@@ -99,6 +87,71 @@ def split_data(y_index, t, t_index):
 	return count_left_neg,count_left_pos,count_right_neg, count_right_pos, right_index, left_index
 
 
+
+############get each feature##################
+def x_feature(x):
+	'''
+	'''
+	x_T = x.T 
+
+	return x_T
+
+
+############Root U Value######################
+def U_value(neg,pos):
+
+	u = 1 - pow((pos/(pos+neg)), 2) - pow((neg/(pos+neg)), 2)
+	return u 
+
+
+def B_value(theda, left_neg,left_pos, right_pos, right_neg, U_root):
+	# right_pos, right_neg, legt_pos, left_neg = count_neg_pos(theda, y_array, x_array)
+	pb_l= (left_pos+left_neg)/(right_pos+right_neg+left_pos+left_neg)
+	pb_r= (right_pos+right_neg)/(right_pos+right_neg+left_pos+left_neg)
+	B_value = U_root - pb_l*U_value(left_neg,left_pos) - pb_r*U_value(right_neg,right_pos)
+	return B_value
+
+def best_B(index,x_array, neg, pos):
+	U_root = U_value(neg, pos)
+	# print(U_root)
+	best_b = 0
+	index_pos = []
+	index_neg = []
+	theda_index= [0,0]
+	a = index
+	b = 
+	c = 
+	for i in index:  
+		for j in range(0,100):
+			theda = x_array[i][j]
+			# print(x_array[i][j])
+			temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos, temp_index_right, temp_index_left = split_data(index ,theda ,[i,j])
+			# print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos, temp_index_right, temp_index_left)
+			if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
+				temp_b=0
+			else:
+				temp_b = B_value(theda,temp_left_neg, temp_left_pos, temp_right_pos, temp_right_neg, U_root )
+			if temp_b > best_b:
+				theda = x_array[i][j]
+				left_pos = temp_left_pos
+				left_neg = temp_left_neg
+				right_neg = temp_right_neg
+				right_pos = temp_right_pos
+				best_b = temp_b
+				index_left = temp_index_left
+				index_right = temp_index_right
+	# print(theda, left_neg, left_pos, right_neg, right_pos, index_left, index_right)
+	return theda, left_neg, left_pos, right_neg, right_pos, index_left, index_right
+
+
+
+
+
+
+
+
+
+############Compute U value###################
 
 # def Split_samples(self, x_to_array, feature):
 # 	'''
