@@ -3,6 +3,7 @@ from math import log
 # import matplotlib.pyplot as plt
 import csv
 import math
+import operator
 
 
 ##########Read File###########
@@ -38,7 +39,7 @@ def x_data(filename):
 			tmp.append(float(x.strip()))		
 		add_x.append(tmp[1:])
 	x_to_array = np.array(add_x)			# x list convert to x array
-
+	
 	return x_to_array
 
 ############get each feature##################
@@ -87,6 +88,15 @@ def split_data(y_index, t, t_index):
 	count_left_neg = list(left_y_value).count(-1)
 	return count_left_neg,count_left_pos,count_right_neg, count_right_pos, right_index, left_index
 
+
+
+############get each feature##################
+def x_feature(x):
+	'''
+	'''
+	x_T = x.T 
+
+	return x_T
 
 
 ############Root U Value######################
