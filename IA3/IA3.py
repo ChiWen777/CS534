@@ -110,18 +110,11 @@ def split_data(y_index, t, t_index):
 
 
 # ############Root U Value######################
-# def U_value(neg,pos):
+def U_value(neg,pos):
 
-# 	u = 1 - pow((pos/(pos+neg)), 2) - pow((neg/(pos+neg)), 2)
-# 	return u 
+	u = 1 - pow((pos/(pos+neg)), 2) - pow((neg/(pos+neg)), 2)
+	return u 
 
-
-# def B_value(theda, left_neg,left_pos, right_pos, right_neg, U_root):
-# 	# right_pos, right_neg, legt_pos, left_neg = count_neg_pos(theda, y_array, x_array)
-# 	pb_l= (left_pos+left_neg)/(right_pos+right_neg+left_pos+left_neg)
-# 	pb_r= (right_pos+right_neg)/(right_pos+right_neg+left_pos+left_neg)
-# 	B_value = U_root - pb_l*U_value(left_neg,left_pos) - pb_r*U_value(right_neg,right_pos)
-# 	return B_value
 
 def B_value(theda, left_neg,left_pos, right_pos, right_neg, U_root):
 	# right_pos, right_neg, legt_pos, left_neg = count_neg_pos(theda, y_array, x_array)
