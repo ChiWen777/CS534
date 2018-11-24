@@ -118,9 +118,9 @@ def best_B(index,x_array, neg, pos):
 	index_pos = []
 	index_neg = []
 	theda_index= [0,0]
-	a = index
-	b = 
-	c = 
+	# a = index
+	# b = 
+	# c = 
 	for i in index:  
 		for j in range(0,100):
 			theda = x_array[i][j]
@@ -234,6 +234,8 @@ dic = list(range(0, 4888))
 com = list(zip(y_array_train, x_array_train))
 dic_data = dict(zip(dic, com))
 dic_v = list(dic_data.values())
-a = list(com[0])
-b = list(a[1])
-print(b[3])
+# a = list(com[0])
+# b = list(a[1])
+# print(b[3])
+
+print (dic_data)
