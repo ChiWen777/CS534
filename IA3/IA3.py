@@ -77,20 +77,19 @@ def split_data(data_left, data_right):
  '''
  data_left, data_right : [index, y, x1....,xn]
  '''
- left_y, right_y = [], []
-
+ left_y = []
+ right_y = []
  for i in range(0, len(data_left)):
   left_y.append(data_left[i][1][0])
 
  for i in range(0, len(data_right)):
   right_y.append(data_right[i][1][0])
 
- count_right_pos = list(right_y).count(1)
- count_right_neg = list(right_y).count(-1)
- count_left_pos = list(left_y).count(1)
- count_left_neg = list(left_y).count(-1)
+ count_right_pos = right_y.count(1)
+ count_right_neg = right_y.count(-1)
+ count_left_pos = left_y.count(1)
+ count_left_neg = left_y.count(-1)
  return count_left_neg,count_left_pos,count_right_neg, count_right_pos
-
 
 # ############Root U Value######################
 def U_value(neg,pos):
@@ -100,7 +99,6 @@ def U_value(neg,pos):
 
 
 def B_value(left_neg,left_pos, right_pos, right_neg, U_root):
-	# right_pos, right_neg, legt_pos, left_neg = count_neg_pos(theda, y_array, x_array)
 	pb_l= (left_pos+left_neg)/(right_pos+right_neg+left_pos+left_neg)
 	pb_r= (right_pos+right_neg)/(right_pos+right_neg+left_pos+left_neg)
 	B_value = U_root - pb_l*U_value(left_neg,left_pos) - pb_r*U_value(right_neg,right_pos)
@@ -113,7 +111,11 @@ def best_B(x_array, neg, pos):
 	theda_index= [0,0]
 	pre_y_value=0
 	curr_y_value=-1
-	count = 0
+	left_y =[]
+	temp_left_neg=0
+	temp_left_pos=0
+	temp_right_neg=0
+	temp_right_pos=0
 	for y in range(1,101):
 		print("looking feaure",y)
 		time_a = time.clock()
@@ -122,15 +124,12 @@ def best_B(x_array, neg, pos):
 			pre_y_value = curr_y_value
 			curr_y_value = x_array_sorted[i][1][0]
 			if pre_y_value != curr_y_value:
-				count += 1
-				theda = x_array_sorted[0][1][y]
 				temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos = split_data(x_array_sorted[0:i-1],x_array_sorted[i:-1])
 				if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
 					temp_b=0
 				else:
 					temp_b = B_value(temp_left_neg, temp_left_pos, temp_right_pos, temp_right_neg, U_root )
 				if temp_b > best_b:
-					theda = x_array_sorted[0][1][y]
 					left_pos = temp_left_pos
 					left_neg = temp_left_neg
 					right_neg = temp_right_neg
@@ -138,13 +137,7 @@ def best_B(x_array, neg, pos):
 					left_array = x_array_sorted[0:i-1]
 					right_array = x_array_sorted[i:-1]
 					best_b = temp_b
-		print ("computation count in feature:",count)
-		count = 0
-		time_b = time.clock()
-		print(best_b)
-		print(time_b-time_a," sec")
-
-	return theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array
+	return  left_neg, left_pos, right_neg, right_pos, left_array, right_array
 
 
 
