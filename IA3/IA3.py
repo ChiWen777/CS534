@@ -157,12 +157,6 @@ def best_B(index,x_array, neg, pos):
 
 
 
-
-
-
-
-
-
 ############Compute U value###################
 
 # def Split_samples(self, x_to_array, feature):
