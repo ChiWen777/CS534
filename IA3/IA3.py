@@ -112,6 +112,7 @@ def B_value(left_neg,left_pos, right_pos, right_neg, U_root):
 
 def best_B(x_array, neg, pos):
 	U_root = U_value(neg, pos)
+	# U_root = 1
 	best_b = 0
 	temp_theda_index = [0,0]
 	theda_index= [0,0]
@@ -124,7 +125,7 @@ def best_B(x_array, neg, pos):
 	temp_right_pos=0
 	count = 0
 	# for y in range(1,101):
-	for y in range(1,102):
+	for y in range(1,101):
 		print("looking feature",y)
 		# print(x_array[np.lexsort((x_array[:,0],x_array[:,y]))])
 		# x_array_temp[np.lexsort((x_array[:,0],x_array[:,y]))]
@@ -139,17 +140,19 @@ def best_B(x_array, neg, pos):
 			# print(i)
 			pre_y_value = curr_y_value
 			# curr_y_value = x_array_sorted[i][1][0]
-			curr_y_value = x_array[i][0]
+			curr_y_value = x_array_sorted[i][0]
 			# print(curr_y_value,pre_y_value)
 			if pre_y_value != curr_y_value:
 				count +=1
+				temp_theda = x_array_sorted [i][y]
 				temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos = split_data(x_array_sorted[0:i-1],x_array_sorted[i:-1])
-				print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos)
+				# print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos)
 				if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
 					temp_b=0
 				else:
 					temp_b = B_value(temp_left_neg, temp_left_pos, temp_right_pos, temp_right_neg, U_root )
 				if temp_b > best_b:
+					theda = temp_theda
 					left_pos = temp_left_pos
 					left_neg = temp_left_neg
 					right_neg = temp_right_neg
@@ -159,7 +162,7 @@ def best_B(x_array, neg, pos):
 					best_b = temp_b
 		print (best_b)
 		print ("computation count in feature: ",count)
-	return  left_neg, left_pos, right_neg, right_pos, left_array, right_array
+	return  theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array
 
 
 
