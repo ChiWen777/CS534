@@ -28,7 +28,8 @@ def original_data(filename):
 			n_str = str_xv.replace('3.0', '1')
 			x_v[0] = float(n_str)
 		total.append(x_v)
-	return total
+		total_to_array = np.array(total)
+	return total_to_array
 
 def y_data(filename):
 	'''
@@ -77,18 +78,23 @@ def split_data(data_left, data_right):
  '''
  data_left, data_right : [index, y, x1....,xn]
  '''
- left_y = []
- right_y = []
- for i in range(0, len(data_left)):
-  left_y.append(data_left[i][1][0])
+ # left_y = []
+ # right_y = []
+ # for i in range(0, len(data_left)):
+ #  left_y.append(data_left[i][1][0])
 
- for i in range(0, len(data_right)):
-  right_y.append(data_right[i][1][0])
+ # for i in range(0, len(data_right)):
+ #  right_y.append(data_right[i][1][0])
+ # print(data_left)
+ left_y = np.transpose(data_left)
+ right_y = np.transpose(data_right)
 
- count_right_pos = right_y.count(1)
- count_right_neg = right_y.count(-1)
- count_left_pos = left_y.count(1)
- count_left_neg = left_y.count(-1)
+
+
+ count_right_pos = (right_y[0]==1).sum()
+ count_right_neg = (right_y[0]==-1).sum()
+ count_left_pos = (left_y[0]==1).sum()
+ count_left_neg = (left_y[0]==-1).sum()
  return count_left_neg,count_left_pos,count_right_neg, count_right_pos
 
 # ############Root U Value######################
@@ -110,21 +116,35 @@ def best_B(x_array, neg, pos):
 	temp_theda_index = [0,0]
 	theda_index= [0,0]
 	pre_y_value=0
-	curr_y_value=-1
+	curr_y_value=0
 	left_y =[]
 	temp_left_neg=0
 	temp_left_pos=0
 	temp_right_neg=0
 	temp_right_pos=0
-	for y in range(1,101):
-		print("looking feaure",y)
-		time_a = time.clock()
-		x_array_sorted=sorted(x_array, key= lambda x: x[1][y])
-		for i in range(1,(len(x_array))):
+	count = 0
+	# for y in range(1,101):
+	for y in range(1,102):
+		print("looking feature",y)
+		# print(x_array[np.lexsort((x_array[:,0],x_array[:,y]))])
+		# x_array_temp[np.lexsort((x_array[:,0],x_array[:,y]))]
+		x_array_sorted = x_array[x_array[:,y].argsort()]
+		# x_array_sorted = x_array[np.lexsort((x_array[:,0],x_array[:,y]))]
+		# print(x_array_sorted)
+		# x_array_sorted=sorted(x_array, key= lambda x: x[1][y])
+		pre_y_value=0
+		curr_y_value=0
+		count =0
+		for i in range(1,np.size(x_array,0)):
+			# print(i)
 			pre_y_value = curr_y_value
-			curr_y_value = x_array_sorted[i][1][0]
+			# curr_y_value = x_array_sorted[i][1][0]
+			curr_y_value = x_array[i][0]
+			# print(curr_y_value,pre_y_value)
 			if pre_y_value != curr_y_value:
+				count +=1
 				temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos = split_data(x_array_sorted[0:i-1],x_array_sorted[i:-1])
+				print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos)
 				if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
 					temp_b=0
 				else:
@@ -137,6 +157,8 @@ def best_B(x_array, neg, pos):
 					left_array = x_array_sorted[0:i-1]
 					right_array = x_array_sorted[i:-1]
 					best_b = temp_b
+		print (best_b)
+		print ("computation count in feature: ",count)
 	return  left_neg, left_pos, right_neg, right_pos, left_array, right_array
 
 
@@ -234,7 +256,7 @@ root_pos = list(y_array_train).count(1)
 root_neg = list(y_array_train).count(-1)
 
 
-print(best_B(dic_data,root_pos,root_neg))
+print(best_B(total_train,root_pos,root_neg))
 
 # print(dic_data)
 ##############data for sorted#################
