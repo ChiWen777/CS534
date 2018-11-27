@@ -8,7 +8,17 @@ from collections import OrderedDict
 import time
 
 
-##########Read File###########
+class Create_Tree:
+    def __init__(self):
+        self.root = Node()
+
+class Node:
+    def __init__(self, theda=-1, depth=-1, lchild=Node(), rchild=Node()):
+        self.lchild = lchild
+        self.rchild = rchild
+		self.depth = depth
+		self.theda = theda
+ 
 def original_data(filename):
 	file = open(filename , 'r')
 	add_o = []
@@ -164,7 +174,63 @@ def best_B(x_array, neg, pos):
 		print ("computation count in feature: ",count)
 	return  theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array
 
+def create_node(root, depth, total_train,root_pos,root_neg):
 
+	theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array = best_B(total_train,root_pos,root_neg)
+	
+	root.theda = theda
+
+	if root.depth < max_depth:
+		if left_neg != 0 and left_pos != 0:
+			root.lchild = create_node(root.lchild, root.depth+1, left_array,left_pos,left_neg)
+		
+		if right_neg != 0 and right_pos != 0:
+			root.rchild = create_node(root.rchild, root.depth+1, right_array,right_pos,right_neg)
+	
+	return root
+
+	
+
+
+############Main Function############
+#train.csv
+y_array_train = y_data('pa3_train_reduced.csv')
+x_array_train = x_data('pa3_train_reduced.csv')
+total_train = original_data('pa3_train_reduced.csv')
+#valid.csv
+y_array_valid = y_data('pa3_valid_reduced.csv')
+x_array_valid = x_data('pa3_valid_reduced.csv')
+
+
+# dic = list(range(0, 4888))
+# dic_data = dict(zip(dic, total_train))
+# values = list(dic_data.values())
+# print(values[0][1])
+
+length = list(range(len(x_array_train)))
+# print(total_train)
+dic_data = list(zip(length, total_train))
+
+# d_sorted_by_value =sorted(dic_data, key= lambda x: x[1][3])
+# print(d_sorted_by_value)
+root_pos = list(y_array_train).count(1)
+root_neg = list(y_array_train).count(-1)
+
+tree = Create_Tree()
+tree.root.depth = 0
+max_depth = 20
+create_node(tree.root, tree.root.depth, total_train,root_pos,root_neg)
+# print(best_B(total_train,root_pos,root_neg))
+
+# print(dic_data)
+##############data for sorted#################
+# values.sort(key=operator.itemgetter(1))\
+# d_sorted_by_value =sorted(dic_data.items(), key= lambda x: x[1][3])
+# dic.sort(key=operator.itemgetter(1))
+# print(values)
+# print(d_sorted_by_value)
+# for key,value in sorted(dic_data.items(), key= lambda x: x[1][3]):
+# 	print (key)
 
 ############Compute U value###################
 
@@ -232,41 +298,3 @@ def best_B(x_array, neg, pos):
 # tree = DecisionTree(x_array_train)
 # print(tree.root)
 
-
-
-############Main Function############
-#train.csv
-y_array_train = y_data('pa3_train_reduced.csv')
-x_array_train = x_data('pa3_train_reduced.csv')
-total_train = original_data('pa3_train_reduced.csv')
-#valid.csv
-y_array_valid = y_data('pa3_valid_reduced.csv')
-x_array_valid = x_data('pa3_valid_reduced.csv')
-
-
-# dic = list(range(0, 4888))
-# dic_data = dict(zip(dic, total_train))
-# values = list(dic_data.values())
-# print(values[0][1])
-
-length = list(range(len(x_array_train)))
-# print(total_train)
-dic_data = list(zip(length, total_train))
-
-# d_sorted_by_value =sorted(dic_data, key= lambda x: x[1][3])
-# print(d_sorted_by_value)
-root_pos = list(y_array_train).count(1)
-root_neg = list(y_array_train).count(-1)
-
-
-print(best_B(total_train,root_pos,root_neg))
-
-# print(dic_data)
-##############data for sorted#################
-# values.sort(key=operator.itemgetter(1))\
-# d_sorted_by_value =sorted(dic_data.items(), key= lambda x: x[1][3])
-# dic.sort(key=operator.itemgetter(1))
-# print(values)
-# print(d_sorted_by_value)
-# for key,value in sorted(dic_data.items(), key= lambda x: x[1][3]):
-# 	print (key)
