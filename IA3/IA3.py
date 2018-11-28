@@ -221,8 +221,6 @@ total_valid = original_data('pa3_valid_reduced.csv')
 # values = list(dic_data.values())
 # print(values[0][1])
 
-
-######### train ######################
 length = list(range(len(x_array_train)))
 # print(total_train)
 dic_data = list(zip(length, total_train))
@@ -231,7 +229,7 @@ dic_data = list(zip(length, total_train))
 # print(d_sorted_by_value)
 root_pos = list(y_array_train).count(1)
 root_neg = list(y_array_train).count(-1)
-size_x = total_train.shape[1]-1
+size_x = total_train.shape[1]
 
 tree = Create_Tree()
 accur = dict()
