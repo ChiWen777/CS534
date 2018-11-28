@@ -7,17 +7,16 @@ import operator
 from collections import OrderedDict
 import time
 
+class Node:
+    def __init__(self, theda=None, depth=None, lchild=None, rchild=None):
+        self.lchild = lchild
+        self.rchild = rchild
+        self.depth = depth
+        self.theda = theda
 
 class Create_Tree:
     def __init__(self):
         self.root = Node()
-
-class Node:
-    def __init__(self, theda=-1, depth=-1, lchild=Node(), rchild=Node()):
-        self.lchild = lchild
-        self.rchild = rchild
-		self.depth = depth
-		self.theda = theda
  
 def original_data(filename):
 	file = open(filename , 'r')
@@ -121,6 +120,7 @@ def B_value(left_neg,left_pos, right_pos, right_neg, U_root):
 	return B_value
 
 def best_B(x_array, neg, pos):
+	theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array = 0, 0, 0, 0, 0, None, None
 	U_root = U_value(neg, pos)
 	# U_root = 1
 	best_b = 0
@@ -174,22 +174,30 @@ def best_B(x_array, neg, pos):
 		print ("computation count in feature: ",count)
 	return  theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array
 
-def create_node(root, depth, total_train,root_pos,root_neg):
+def create_node(root, depth, total_train,root_pos,root_neg, accur):
 
 	theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array = best_B(total_train,root_pos,root_neg)
 	
 	root.theda = theda
+	root.lchild = Node()
+	root.rchild = Node()
+	root.depth = depth
 
+	accur[root.depth] = accur.setdefault(root.depth, 0) + min(left_neg, left_pos) + min(right_neg, right_pos)
+	print('==================================================', root.depth)
 	if root.depth < max_depth:
 		if left_neg != 0 and left_pos != 0:
-			root.lchild = create_node(root.lchild, root.depth+1, left_array,left_pos,left_neg)
+			root.lchild = create_node(root.lchild, depth+1, left_array,left_pos,left_neg, accur)
 		
 		if right_neg != 0 and right_pos != 0:
-			root.rchild = create_node(root.rchild, root.depth+1, right_array,right_pos,right_neg)
+			root.rchild = create_node(root.rchild, depth+1, right_array,right_pos,right_neg, accur)
 	
 	return root
 
-	
+def compute_accur(accur, leng):
+	print('============accur=================================')
+	for key, value in enumerate(accur):
+		print('depth: ', key, " ;  accur:", 1-(accur[key]/leng))
 
 
 ############Main Function############
@@ -217,84 +225,9 @@ root_pos = list(y_array_train).count(1)
 root_neg = list(y_array_train).count(-1)
 
 tree = Create_Tree()
+accur = dict()
 tree.root.depth = 0
 max_depth = 20
-create_node(tree.root, tree.root.depth, total_train,root_pos,root_neg)
-# print(best_B(total_train,root_pos,root_neg))
-
-# print(dic_data)
-##############data for sorted#################
-# values.sort(key=operator.itemgetter(1))\
-# d_sorted_by_value =sorted(dic_data.items(), key= lambda x: x[1][3])
-# dic.sort(key=operator.itemgetter(1))
-# print(values)
-# print(d_sorted_by_value)
-# for key,value in sorted(dic_data.items(), key= lambda x: x[1][3]):
-# 	print (key)
-
-############Compute U value###################
-
-# def Split_samples(self, x_to_array, feature):
-# 	'''
-		
-# 	'''
-# 	ret = {}
-# 	for x in x_to_array:
-# 		val = x[feature]
-# 		ret.setdefault(val, [])
-# 		ret[val].append(x)
-# 	return ret
-
-# 	# file = open(filename , 'r')
-# 	# add_x = []
-# 	# x = []
-# 	# a = csv.reader(file)
-# 	# for row in a :
-# 	# 	for i in range(2):
-# 	# 		add_x.append(row[i])
-# 	# 	x.append(add_x)
-# 	# x_to_array = np.array(x)
-# 	# return x_to_array
-
-
-
-
-# ###########Split data#######################
-# def Split_data(self, x, level=0):
-# 	'''
-# 	'''
-# 	if stop_now(x):
-# 		return x[0][-1]
-
-# 	#split data
-# 	feature = self.get_feature(x, level)
-# 	subsets = self.Split_samples(s, feature)
-
-# 	return {key: self.Split_data(subset, level+1) for key, subset in subsets.item()}
-
-
-# #########
-# def stop_now(self, x):
-# 	'''
-# 	'''
-# 	labels = [d[-1] for d in x]
-
-# 	return len(set(labels)) <=1
-
-# ##########
-# def get_feature(self, x, level):
-# 	'''
-# 	'''
-# 	return level
-
-# class DecisionTree(object):
-# 	'''
-# 	'''
-# 	def __init__(self, x):
-# 		super(DecisionTree, self).__init__()
-# 		self.root = self.Split_data(x)
-
-
-# tree = DecisionTree(x_array_train)
-# print(tree.root)
+create_node(tree.root, 0, total_train,root_pos,root_neg, accur)
+compute_accur(accur, len(length))
 
