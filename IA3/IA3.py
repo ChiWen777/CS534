@@ -172,8 +172,8 @@ def best_B(x_array, pos, neg, size_x):
 					left_neg = temp_left_neg
 					right_neg = temp_right_neg
 					right_pos = temp_right_pos
-					left_array = x_array_sorted[0:i-1]
-					right_array = x_array_sorted[i:-1]
+					left_array = x_array_sorted[0:i]
+					right_array = x_array_sorted[i:]
 					best_b = temp_b
 		print (best_b)
 		print ("computation count in feature: ",count)
@@ -221,8 +221,6 @@ total_valid = original_data('pa3_valid_reduced.csv')
 # values = list(dic_data.values())
 # print(values[0][1])
 
-
-######### train ######################
 length = list(range(len(x_array_train)))
 # print(total_train)
 dic_data = list(zip(length, total_train))
@@ -231,7 +229,7 @@ dic_data = list(zip(length, total_train))
 # print(d_sorted_by_value)
 root_pos = list(y_array_train).count(1)
 root_neg = list(y_array_train).count(-1)
-size_x = total_train.shape[1]-1
+size_x = total_train.shape[1]
 
 tree = Create_Tree()
 accur = dict()
