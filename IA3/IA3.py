@@ -172,8 +172,8 @@ def best_B(x_array, pos, neg, size_x):
 					left_neg = temp_left_neg
 					right_neg = temp_right_neg
 					right_pos = temp_right_pos
-					left_array = x_array_sorted[0:i-1]
-					right_array = x_array_sorted[i:-1]
+					left_array = x_array_sorted[0:i]
+					right_array = x_array_sorted[i:]
 					best_b = temp_b
 		print (best_b)
 		print ("computation count in feature: ",count)
