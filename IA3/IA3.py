@@ -8,11 +8,12 @@ from collections import OrderedDict
 import time
 
 class Node:
-    def __init__(self, theda=None, depth=None, lchild=None, rchild=None):
+    def __init__(self, theda=None, depth=None, lchild=None, rchild=None, feature=None):
         self.lchild = lchild
         self.rchild = rchild
         self.depth = depth
         self.theda = theda
+        self.feature = feature
 
 class Create_Tree:
     def __init__(self):
@@ -119,7 +120,7 @@ def B_value(left_neg,left_pos, right_pos, right_neg, U_root):
 	B_value = U_root - pb_l*U_value(left_neg,left_pos) - pb_r*U_value(right_neg,right_pos)
 	return B_value
 
-def best_B(x_array, neg, pos):
+def best_B(x_array, pos, neg, size_x):
 	theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array = 0, 0, 0, 0, 0, None, None
 	U_root = U_value(neg, pos)
 	# U_root = 1
@@ -129,13 +130,15 @@ def best_B(x_array, neg, pos):
 	pre_y_value=0
 	curr_y_value=0
 	left_y =[]
+	best_feature = 0
+	temp_feature = 0
 	temp_left_neg=0
 	temp_left_pos=0
 	temp_right_neg=0
 	temp_right_pos=0
 	count = 0
 	# for y in range(1,101):
-	for y in range(1,101):
+	for y in range(1,size_x):
 		print("looking feature",y)
 		# print(x_array[np.lexsort((x_array[:,0],x_array[:,y]))])
 		# x_array_temp[np.lexsort((x_array[:,0],x_array[:,y]))]
@@ -155,6 +158,7 @@ def best_B(x_array, neg, pos):
 			if pre_y_value != curr_y_value:
 				count +=1
 				temp_theda = x_array_sorted [i][y]
+				temp_feature = i
 				temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos = split_data(x_array_sorted[0:i-1],x_array_sorted[i:-1])
 				# print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos)
 				if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
@@ -162,6 +166,7 @@ def best_B(x_array, neg, pos):
 				else:
 					temp_b = B_value(temp_left_neg, temp_left_pos, temp_right_pos, temp_right_neg, U_root )
 				if temp_b > best_b:
+					best_feature = temp_feature
 					theda = temp_theda
 					left_pos = temp_left_pos
 					left_neg = temp_left_neg
@@ -172,12 +177,13 @@ def best_B(x_array, neg, pos):
 					best_b = temp_b
 		print (best_b)
 		print ("computation count in feature: ",count)
-	return  theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array
+	return  theda, best_feature, left_neg, left_pos, right_neg, right_pos, left_array, right_array
 
-def create_node(root, depth, total_train,root_pos,root_neg, accur):
+def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 
-	theda, left_neg, left_pos, right_neg, right_pos, left_array, right_array = best_B(total_train,root_pos,root_neg)
+	theda, best_feature, left_neg, left_pos, right_neg, right_pos, left_array, right_array = best_B(total_train,root_pos,root_neg,size_x)
 	
+	root.feature = best_feature
 	root.theda = theda
 	root.lchild = Node()
 	root.rchild = Node()
@@ -187,10 +193,10 @@ def create_node(root, depth, total_train,root_pos,root_neg, accur):
 	print('==================================================', root.depth)
 	if root.depth < max_depth:
 		if left_neg != 0 and left_pos != 0:
-			root.lchild = create_node(root.lchild, depth+1, left_array,left_pos,left_neg, accur)
+			root.lchild = create_node(root.lchild, depth+1, left_array,left_pos,left_neg, accur, size_x)
 		
 		if right_neg != 0 and right_pos != 0:
-			root.rchild = create_node(root.rchild, depth+1, right_array,right_pos,right_neg, accur)
+			root.rchild = create_node(root.rchild, depth+1, right_array,right_pos,right_neg, accur, size_x)
 	
 	return root
 
@@ -208,13 +214,15 @@ total_train = original_data('pa3_train_reduced.csv')
 #valid.csv
 y_array_valid = y_data('pa3_valid_reduced.csv')
 x_array_valid = x_data('pa3_valid_reduced.csv')
-
+total_valid = original_data('pa3_valid_reduced.csv')
 
 # dic = list(range(0, 4888))
 # dic_data = dict(zip(dic, total_train))
 # values = list(dic_data.values())
 # print(values[0][1])
 
+
+######### train ######################
 length = list(range(len(x_array_train)))
 # print(total_train)
 dic_data = list(zip(length, total_train))
@@ -223,11 +231,11 @@ dic_data = list(zip(length, total_train))
 # print(d_sorted_by_value)
 root_pos = list(y_array_train).count(1)
 root_neg = list(y_array_train).count(-1)
+size_x = total_train.shape[1]-1
 
 tree = Create_Tree()
 accur = dict()
 tree.root.depth = 0
 max_depth = 20
-create_node(tree.root, 0, total_train,root_pos,root_neg, accur)
+create_node(tree.root, 0, total_train,root_pos,root_neg, accur, size_x)
 compute_accur(accur, len(length))
-
