@@ -8,12 +8,13 @@ from collections import OrderedDict
 import time
 
 class Node:
-    def __init__(self, theda=None, depth=None, lchild=None, rchild=None, feature=None):
+    def __init__(self, theda=None, depth=None, lchild=None, rchild=None, feature=0, label=None):
         self.lchild = lchild
         self.rchild = rchild
         self.depth = depth
         self.theda = theda
         self.feature = feature
+        self.label = label
 
 class Create_Tree:
     def __init__(self):
@@ -107,6 +108,13 @@ def split_data(data_left, data_right):
  count_left_neg = (left_y[0]==-1).sum()
  return count_left_neg,count_left_pos,count_right_neg, count_right_pos
 
+
+def single_data_count(data):
+	y_data = np.transpose(data)
+	count_y_pos = (y_data[0]==1).sum()
+	count_y_neg = (y_data[0]==-1).sum()
+	return count_y_neg,count_y_pos
+
 # ############Root U Value######################
 def U_value(neg,pos):
 
@@ -139,7 +147,7 @@ def best_B(x_array, pos, neg, size_x):
 	count = 0
 	# for y in range(1,101):
 	for y in range(1,size_x):
-		print("looking feature",y)
+		# print("looking feature",y)
 		# print(x_array[np.lexsort((x_array[:,0],x_array[:,y]))])
 		# x_array_temp[np.lexsort((x_array[:,0],x_array[:,y]))]
 		x_array_sorted = x_array[x_array[:,y].argsort()]
@@ -175,9 +183,16 @@ def best_B(x_array, pos, neg, size_x):
 					left_array = x_array_sorted[0:i]
 					right_array = x_array_sorted[i:]
 					best_b = temp_b
-		print (best_b)
-		print ("computation count in feature: ",count)
+		# print (best_b)
+		# print ("computation count in feature: ",count)
 	return  theda, best_feature, left_neg, left_pos, right_neg, right_pos, left_array, right_array
+
+def setlabel(pos, neg):
+	if pos >= neg:
+		return 1
+	else:
+		return -1
+
 
 def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 
@@ -185,25 +200,86 @@ def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 	
 	root.feature = best_feature
 	root.theda = theda
-	root.lchild = Node()
-	root.rchild = Node()
 	root.depth = depth
+	root.label = setlabel(root_pos, root_neg)
+	# print("root.label:",root.label)
 
-	accur[root.depth] = accur.setdefault(root.depth, 0) + min(left_neg, left_pos) + min(right_neg, right_pos)
-	print('==================================================', root.depth)
+
+	accur[root.depth+1] = accur.setdefault(root.depth+1, 0) + min(left_neg, left_pos) + min(right_neg, right_pos)
+
 	if root.depth < max_depth:
 		if left_neg != 0 and left_pos != 0:
+			root.lchild = Node()
 			root.lchild = create_node(root.lchild, depth+1, left_array,left_pos,left_neg, accur, size_x)
+		else:
+			root.lchild = Node()
+			root.lchild.label = setlabel(left_pos, left_neg)
 		
 		if right_neg != 0 and right_pos != 0:
+			root.rchild = Node()
 			root.rchild = create_node(root.rchild, depth+1, right_array,right_pos,right_neg, accur, size_x)
+		else:
+			root.rchild = Node()
+			root.rchild.label = setlabel(right_pos, right_neg)
+
+			####QQ: 如果其一為0是否也要建node 設其label值？上面兩個的else
 	
 	return root
 
 def compute_accur(accur, leng):
 	print('============accur=================================')
-	for key, value in enumerate(accur):
+	for key in accur:
 		print('depth: ', key, " ;  accur:", 1-(accur[key]/leng))
+
+def v_setLabel(pos, neg, label):
+	# print("===========v_setLabel", label)
+
+	#error rate
+	if label == 1:
+		return neg
+	else:
+		return pos
+
+
+def validation(root, depth, total_valid, v_accur, root_pos, root_neg):
+	if depth <= max_depth:
+		if root.theda ==  None:
+			# leaf
+			for j in range(depth+1, max_depth+1):
+				v_accur[j] = v_accur.setdefault(j, 0) + v_setLabel(root_pos, root_neg, root.label)
+		else:
+
+			count_left_neg,count_left_pos,count_right_neg, count_right_pos, left_array, right_array = 0,0,0,0,[],[]
+
+			print("root.feature: ",root.feature)
+			print("root.theda: ",root.theda)
+			x_array_sorted = total_valid[total_valid[:,root.feature].argsort()]
+			x_array_sorted_t = np.transpose(x_array_sorted)
+			split_point = (x_array_sorted_t[root.feature] < root.theda).sum()
+			left_array = x_array_sorted[0:split_point]
+			right_array = x_array_sorted[split_point:]
+			count_left_neg,count_left_pos,count_right_neg, count_right_pos = split_data(left_array, right_array)
+			# for i in range(0,np.size(total_valid,0)):
+			# 	left_array = x_array_sorted[0:i]
+			# 	right_array = x_array_sorted[i:]
+			# 	count_left_neg,count_left_pos,count_right_neg, count_right_pos = split_data(left_array, right_array)
+						
+			# 	if x_array_sorted[i][root.feature] >= root.theda:
+			# 		break
+
+
+			# v_accur[depth+1] = v_accur.setdefault(depth+1, 0) + v_setLabel(count_right_pos, count_right_neg, root.rchild.label) + v_setLabel(count_left_pos, count_left_neg, root.lchild.label)
+
+			if root.lchild != None or root.rchild != None:
+				v_accur[depth+1] = v_accur.setdefault(depth+1, 0) + v_setLabel(count_right_pos, count_right_neg, root.rchild.label) + v_setLabel(count_left_pos, count_left_neg, root.lchild.label)
+				validation(root.lchild, depth+1, left_array, v_accur, count_left_pos, count_left_neg)
+				validation(root.rchild, depth+1, right_array, v_accur, count_right_pos, count_right_neg)
+			# else:
+			# 	for j in range(depth+1, max_depth+1):
+			# 			v_accur[j] = v_accur.setdefault(j, 0) + v_setLabel(root_pos, root_neg, root.label)
+
+	
+	return root
 
 
 ############Main Function############
@@ -237,3 +313,12 @@ tree.root.depth = 0
 max_depth = 20
 create_node(tree.root, 0, total_train,root_pos,root_neg, accur, size_x)
 compute_accur(accur, len(length))
+
+########## valid ####################
+v_length = list(range(len(x_array_valid)))
+v_accur = dict()
+root_pos = list(y_array_valid).count(1)
+root_neg = list(y_array_valid).count(-1)
+
+validation(tree.root, 0, total_valid, v_accur, root_pos, root_neg)
+compute_accur(v_accur, len(v_length))
