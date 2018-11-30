@@ -158,7 +158,7 @@ def best_B(x_array, pos, neg, size_x):
 			if pre_y_value != curr_y_value:
 				count +=1
 				temp_theda = x_array_sorted [i][y]
-				temp_feature = i
+				temp_feature = y
 				temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos = split_data(x_array_sorted[0:i],x_array_sorted[i:])
 				# print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos)
 				if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
