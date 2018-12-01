@@ -308,11 +308,15 @@ for i in range(0, 1629):
  vdata_idx.append([i])
 total_valid = np.append(total_valid, vdata_idx, axis = 1)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e4f80c03e7df70e36ee5002f25ca0f4806015a5a
 length = list(range(len(x_array_train)))
 
 dic_data = list(zip(length, total_train))
 
+<<<<<<< HEAD
 tree_number = [1,2,5,10,25]
 num_feature = 10
 tree_list = list()
@@ -374,3 +378,17 @@ for i in tree_number:
 	print("train: ",accu_train)
 	print("valid: ",accu_valid)
 
+=======
+# d_sorted_by_value =sorted(dic_data, key= lambda x: x[1][3])
+# print(d_sorted_by_value)
+root_pos = list(y_array_train).count(1)
+root_neg = list(y_array_train).count(-1)
+size_x = total_train.shape[1]
+
+tree = Create_Tree()
+accur = dict()
+tree.root.depth = 0
+max_depth = 20
+create_node(tree.root, 0, total_train,root_pos,root_neg, accur, size_x)
+compute_accur(accur, len(length))
+>>>>>>> e4f80c03e7df70e36ee5002f25ca0f4806015a5a
