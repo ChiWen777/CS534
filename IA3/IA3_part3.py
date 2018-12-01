@@ -8,17 +8,20 @@ from collections import OrderedDict
 import time
 
 class Node:
-    def __init__(self, theda=None, depth=None, lchild=None, rchild=None, feature=None):
+    def __init__(self, theda=None, depth=None, lchild=None, rchild=None, feature=0, label=None):
         self.lchild = lchild
         self.rchild = rchild
         self.depth = depth
         self.theda = theda
         self.feature = feature
+        self.label = label
 
 class Create_Tree:
     def __init__(self):
         self.root = Node()
- 
+
+
+
 def original_data(filename):
 	file = open(filename , 'r')
 	add_o = []
@@ -86,33 +89,25 @@ def x_feature(x):
 ############Split data###################
 def split_data(data_left, data_right):
  '''
- data_left, data_right : [index, y, x1....,xn]
+ data_left, data_right : [y, x1....,xn, index]
  '''
- # left_y = []
- # right_y = []
- # for i in range(0, len(data_left)):
- #  left_y.append(data_left[i][1][0])
+ left_pos_idx = np.where((data_left.T)[0]==1)[0]
+ left_neg_idx = np.where((data_left.T)[0]==-1)[0]
+ right_pos_idx = np.where((data_left.T)[0]==1)[0]
+ right_neg_idx = np.where((data_left.T)[0]==-1)[0]
 
- # for i in range(0, len(data_right)):
- #  right_y.append(data_right[i][1][0])
- # print(data_left)
- left_y = np.transpose(data_left)
- right_y = np.transpose(data_right)
+ count_right_pos = np.sum(D[right_pos_idx])
+ count_right_neg = np.sum(D[right_neg_idx])
+ count_left_pos = np.sum(D[left_pos_idx])
+ count_left_neg = np.sum(D[left_neg_idx])
 
-
-
- count_right_pos = (right_y[0]==1).sum()
- count_right_neg = (right_y[0]==-1).sum()
- count_left_pos = (left_y[0]==1).sum()
- count_left_neg = (left_y[0]==-1).sum()
  return count_left_neg,count_left_pos,count_right_neg, count_right_pos
+
 
 # ############Root U Value######################
 def U_value(neg,pos):
-
 	u = 1 - pow((pos/(pos+neg)), 2) - pow((neg/(pos+neg)), 2)
 	return u 
-
 
 def B_value(left_neg,left_pos, right_pos, right_neg, U_root):
 	pb_l= (left_pos+left_neg)/(right_pos+right_neg+left_pos+left_neg)
@@ -137,16 +132,8 @@ def best_B(x_array, pos, neg, size_x):
 	temp_right_neg=0
 	temp_right_pos=0
 	count = 0
-	# for y in range(1,101):
-	for y in range(1,size_x):
-		print("looking feature",y)
-		# print(x_array[np.lexsort((x_array[:,0],x_array[:,y]))])
-		# x_array_temp[np.lexsort((x_array[:,0],x_array[:,y]))]
+	for y in range(1,size_x):	
 		x_array_sorted = x_array[x_array[:,y].argsort()]
-		# x_array_sorted = x_array[np.lexsort((x_array[:,0],x_array[:,y]))]
-		# print(x_array_sorted)
-		# x_array_sorted=sorted(x_array, key= lambda x: x[1][y])
-		pre_y_value=0
 		curr_y_value=0
 		count =0
 		for i in range(1,np.size(x_array,0)):
@@ -158,7 +145,7 @@ def best_B(x_array, pos, neg, size_x):
 			if pre_y_value != curr_y_value:
 				count +=1
 				temp_theda = x_array_sorted [i][y]
-				temp_feature = i
+				temp_feature = y
 				temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos = split_data(x_array_sorted[0:i],x_array_sorted[i:])
 				# print(temp_left_neg, temp_left_pos, temp_right_neg, temp_right_pos)
 				if temp_left_neg==temp_left_pos==0 or temp_right_pos==temp_right_neg==0:
@@ -175,9 +162,15 @@ def best_B(x_array, pos, neg, size_x):
 					left_array = x_array_sorted[0:i]
 					right_array = x_array_sorted[i:]
 					best_b = temp_b
-		print (best_b)
-		print ("computation count in feature: ",count)
 	return  theda, best_feature, left_neg, left_pos, right_neg, right_pos, left_array, right_array
+
+
+def setlabel(pos, neg):
+	if pos >= neg:
+		return 1
+	else:
+		return -1
+
 
 def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 
@@ -185,25 +178,115 @@ def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 	
 	root.feature = best_feature
 	root.theda = theda
-	root.lchild = Node()
-	root.rchild = Node()
 	root.depth = depth
+	root.label = setlabel(root_pos, root_neg)
+	a = []
 
-	accur[root.depth] = accur.setdefault(root.depth, 0) + min(left_neg, left_pos) + min(right_neg, right_pos)
-	print('==================================================', root.depth)
+	accur[root.depth+1] = accur.setdefault(root.depth+1, 0) + min(left_neg, left_pos) + min(right_neg, right_pos)
+
 	if root.depth < max_depth:
 		if left_neg != 0 and left_pos != 0:
+			root.lchild = Node()
 			root.lchild = create_node(root.lchild, depth+1, left_array,left_pos,left_neg, accur, size_x)
+		else:
+			root.lchild = Node()
+			root.lchild.label = setlabel(left_pos, left_neg)
 		
 		if right_neg != 0 and right_pos != 0:
+			root.rchild = Node()
 			root.rchild = create_node(root.rchild, depth+1, right_array,right_pos,right_neg, accur, size_x)
-	
+		else:
+			root.rchild = Node()
+			root.rchild.label = setlabel(right_pos, right_neg)
+
 	return root
 
-def compute_accur(accur, leng):
-	print('============accur=================================')
-	for key, value in enumerate(accur):
-		print('depth: ', key, " ;  accur:", 1-(accur[key]/leng))
+# def compute_accur(accur, leng):
+# 	print('============accur=================================')
+# 	for key in accur:
+# 		print('depth: ', key, " ;  accur:", 1-(accur[key]/leng))
+
+def sort_cut(total_valid, feature, theda):
+	x_array_sorted = total_valid[total_valid[:,feature].argsort()]
+	x_array_sorted_t = np.transpose(x_array_sorted)
+
+	split_point = (x_array_sorted_t[feature] < theda).sum()
+
+	left_array = x_array_sorted[0:split_point]
+	right_array = x_array_sorted[split_point:]
+
+	count_left_neg,count_left_pos,count_right_neg, count_right_pos = split_data(left_array, right_array)
+	
+	return left_array, right_array, count_left_neg,count_left_pos,count_right_neg, count_right_pos
+
+
+###############Adaboost#############################
+
+def output_pred_y(total_data, root):
+	# print("total_data.shape[1]: ", total_data.shape[0])
+	pred_y = np.zeros(total_data.shape[0])
+
+	find_leaf(total_data, root, pred_y)
+	return pred_y
+
+def find_leaf(total_data, root, pred_y):
+	if root.lchild == None or root.rchild == None:
+		idx_array = get_index(total_data)
+		for idx in idx_array:
+			pred_y[int(idx)] = root.label
+
+	else:
+		left_array, right_array, _,_,_,_ = sort_cut(total_data, root.feature, root.theda)
+
+		find_leaf(left_array, root.lchild, pred_y)
+		find_leaf(right_array, root.rchild, pred_y)
+
+def get_index(data):
+	trans_data = np.transpose(data)
+	idx = trans_data[-1]
+	return idx
+
+def Cal_Error(data, root):
+	'''
+		Input: label of leaf node(predict), y_idx
+		1. Build the tree
+		2. caculate error
+		Output: error
+	'''
+	predict_y = output_pred_y(data, tree.root)
+	data_y = (data.T)[0]
+
+	add = predict_y + data_y
+	result = (add==0).sum()
+	total_num = len(data)
+	err = result/total_num
+	acc = 1-err
+	
+	return err, acc
+
+def alpha(data, root):
+	error, accur = Cal_Error(data, tree.root)
+	return ((1/2)*math.log((1-error)/error))
+
+def ChangeDistribution(data, root):
+	predict_y = output_pred_y(data,tree.root)
+	data_y = (data.T)[0]
+	alp = alpha(data, tree.root)
+	D_value = 0
+	D_1 = []
+	for i in range(0, len(D)):
+		if predict_y[i] != data_y[i]:
+			D_value = D[i] * math.exp(alp)
+			D_1.append(D_value)
+		else:
+			D_value = D[i] * math.exp(-alp)
+			D_1.append(D_value)
+	D_sum = sum(D_1)
+	next_D = np.array(D_1)/D_sum
+	return next_D
+
+
+
 
 
 ############Main Function############
@@ -216,24 +299,31 @@ y_array_valid = y_data('pa3_valid_reduced.csv')
 x_array_valid = x_data('pa3_valid_reduced.csv')
 total_valid = original_data('pa3_valid_reduced.csv')
 
-# dic = list(range(0, 4888))
-# dic_data = dict(zip(dic, total_train))
-# values = list(dic_data.values())
-# print(values[0][1])
+data_idx=[]
+for i in range(0, 4888):
+	data_idx.append([i])
+total_train = np.append(total_train, data_idx, axis = 1)
+
+vdata_idx=[]
+for i in range(0, 1629):
+	vdata_idx.append([i])
+total_valid = np.append(total_valid, vdata_idx, axis = 1)
+
 
 length = list(range(len(x_array_train)))
-# print(total_train)
 dic_data = list(zip(length, total_train))
-
-# d_sorted_by_value =sorted(dic_data, key= lambda x: x[1][3])
-# print(d_sorted_by_value)
-root_pos = list(y_array_train).count(1)
-root_neg = list(y_array_train).count(-1)
-size_x = total_train.shape[1]
-
 tree = Create_Tree()
 accur = dict()
-tree.root.depth = 0
-max_depth = 20
-create_node(tree.root, 0, total_train,root_pos,root_neg, accur, size_x)
-compute_accur(accur, len(length))
+max_depth = 9
+D = np.repeat(1/4888, 4888)
+
+pos_idx = np.where(y_array_valid==1)[0] 
+root_pos = np.sum(D[pos_idx])
+neg_idx = np.where(y_array_valid==-1)[0]
+root_neg = np.sum(D[neg_idx])
+
+size_x = total_train.shape[1]
+
+
+create_node(tree.root, 0, total_train, root_pos, root_neg, accur,size_x-1)
+print(Cal_Error(total_train, tree.root))
