@@ -6,6 +6,7 @@ import math
 import operator
 from collections import OrderedDict
 import time
+import random as rd
 
 class Node:
     def __init__(self, theda=None, depth=None, lchild=None, rchild=None, feature=0, label=None):
@@ -19,8 +20,6 @@ class Node:
 class Create_Tree:
     def __init__(self):
         self.root = Node()
-
-
 
 def original_data(filename):
 	file = open(filename , 'r')
@@ -93,14 +92,13 @@ def split_data(data_left, data_right):
  '''
  left_pos_idx = np.where((data_left.T)[0]==1)[0]
  left_neg_idx = np.where((data_left.T)[0]==-1)[0]
- right_pos_idx = np.where((data_left.T)[0]==1)[0]
- right_neg_idx = np.where((data_left.T)[0]==-1)[0]
+ right_pos_idx = np.where((data_right.T)[0]==1)[0]
+ right_neg_idx = np.where((data_right.T)[0]==-1)[0]
 
  count_right_pos = np.sum(D[right_pos_idx])
  count_right_neg = np.sum(D[right_neg_idx])
  count_left_pos = np.sum(D[left_pos_idx])
  count_left_neg = np.sum(D[left_neg_idx])
-
  return count_left_neg,count_left_pos,count_right_neg, count_right_pos
 
 
@@ -180,11 +178,10 @@ def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 	root.theda = theda
 	root.depth = depth
 	root.label = setlabel(root_pos, root_neg)
-	a = []
-
+	
 	accur[root.depth+1] = accur.setdefault(root.depth+1, 0) + min(left_neg, left_pos) + min(right_neg, right_pos)
 
-	if root.depth < max_depth:
+	if root.depth <= max_depth:
 		if left_neg != 0 and left_pos != 0:
 			root.lchild = Node()
 			root.lchild = create_node(root.lchild, depth+1, left_array,left_pos,left_neg, accur, size_x)
@@ -206,8 +203,8 @@ def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 # 	for key in accur:
 # 		print('depth: ', key, " ;  accur:", 1-(accur[key]/leng))
 
-def sort_cut(total_valid, feature, theda):
-	x_array_sorted = total_valid[total_valid[:,feature].argsort()]
+def sort_cut(total_train, feature, theda):
+	x_array_sorted = total_train[total_train[:,feature].argsort()]
 	x_array_sorted_t = np.transpose(x_array_sorted)
 
 	split_point = (x_array_sorted_t[feature] < theda).sum()
@@ -246,48 +243,50 @@ def get_index(data):
 	idx = trans_data[-1]
 	return idx
 
-def Cal_Error(data, root):
+#######################AdaBoost##############################
+def Cal_Error(data, root, pred_y):
 	'''
 		Input: label of leaf node(predict), y_idx
 		1. Build the tree
 		2. caculate error
 		Output: error
 	'''
-	predict_y = output_pred_y(data, tree.root)
+	# predict_y = output_pred_y(data, root)
 	data_y = (data.T)[0]
-
 	add = predict_y + data_y
 	result = (add==0).sum()
 	total_num = len(data)
 	err = result/total_num
 	acc = 1-err
-	
 	return err, acc
 
-def alpha(data, root):
-	error, accur = Cal_Error(data, tree.root)
+def alpha(data, root, pred_y):
+	error, accur = Cal_Error(data, root,pred_y)
 	return ((1/2)*math.log((1-error)/error))
 
-def ChangeDistribution(data, root):
-	predict_y = output_pred_y(data,tree.root)
+def ChangeDistribution(data, root,pred_y):
+	# predict_y = output_pred_y(data,root)
 	data_y = (data.T)[0]
-	alp = alpha(data, tree.root)
+	alp = alpha(data, root,pred_y)
 	D_value = 0
 	D_1 = []
 	for i in range(0, len(D)):
-		if predict_y[i] != data_y[i]:
+		if pred_y[i] != data_y[i]:
 			D_value = D[i] * math.exp(alp)
 			D_1.append(D_value)
 		else:
 			D_value = D[i] * math.exp(-alp)
 			D_1.append(D_value)
-	D_sum = sum(D_1)
-	next_D = np.array(D_1)/D_sum
+	# D_sum = sum(D_1)
+	# next_D = np.array(D_1)/D_sum
+	next_D = np.array(D_1)
 	return next_D
 
-
-
-
+def accu_calculate(pred_y,y_array):
+	calculate_y = np.add(pred_y,y_array)
+	error_value = (calculate_y == 0).sum()
+	accu = (pred_y.shape[0]-error_value)/pred_y.shape[0]
+	return accu
 
 ############Main Function############
 #train.csv
@@ -312,18 +311,51 @@ total_valid = np.append(total_valid, vdata_idx, axis = 1)
 
 length = list(range(len(x_array_train)))
 dic_data = list(zip(length, total_train))
-tree = Create_Tree()
-accur = dict()
-max_depth = 9
+# tree = Create_Tree()
+
+max_depth = 8
 D = np.repeat(1/4888, 4888)
-
-pos_idx = np.where(y_array_valid==1)[0] 
-root_pos = np.sum(D[pos_idx])
-neg_idx = np.where(y_array_valid==-1)[0]
-root_neg = np.sum(D[neg_idx])
-
 size_x = total_train.shape[1]
+result_t, result_v = np.zeros(total_train.shape[0]), np.zeros(total_valid.shape[0])
+tmp_y = np.zeros(y_array_train.shape[0])
 
+##########Run L in [1, 5, 10 ,20]############
+# L = [1, 5, 10, 20]
+tree_list = list()
+for i in range(1):
+	#Create tree
+	tree_list.append(Create_Tree())
+	accur = dict()
+	pos_idx = np.where(y_array_train==1)[0] 
+	root_pos = np.sum(D[pos_idx])
+	neg_idx = np.where(y_array_train==-1)[0]
+	root_neg = np.sum(D[neg_idx])
+	create_node(tree_list[i].root, 0, total_train, root_pos, root_neg, accur,size_x-1)
 
-create_node(tree.root, 0, total_train, root_pos, root_neg, accur,size_x-1)
-print(Cal_Error(total_train, tree.root))
+	#After Create Tree we can get predict y
+	predict_y = output_pred_y(total_train, tree_list[i].root)
+	tmp_y = predict_y
+	predict_y_v = output_pred_y(total_valid,tree_list[i].root)
+	alp = alpha(total_train, tree_list[i].root, predict_y)
+	result_v = np.add(alp*predict_y_v, result_v)
+	result_t = np.add(alp*predict_y, result_t)
+	D = np.copy(ChangeDistribution(total_train, tree_list[i].root, predict_y))
+	# D = ChangeDistribution(total_train, tree_list[i].root, predict_y)
+	# print("i:", i+1)
+	# print("predict:", predict_y)
+	# print("D:", D)
+	# print("alpha", alp)
+	# print("ERR, ACC:", Cal_Error(total_train, tree_list[i].root, predict_y))
+
+total_result = np.sign(result_t)
+total_result_v = np.sign(result_v)
+for k in range(total_result.shape[0]):
+	if total_result[k] == 0:
+		total_result[k] == rd.choice([1,-1])
+
+for k in range(total_result_v.shape[0]):
+	if total_result_v[k] == 0:
+		total_result_v[k] == rd.choice([1,-1])
+print("Number of tree", i+1)
+print("train:",accu_calculate(total_result, y_array_train))
+print("valid:",accu_calculate(total_result_v, y_array_valid))
