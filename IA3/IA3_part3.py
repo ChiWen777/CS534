@@ -187,6 +187,7 @@ def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 			root.lchild = create_node(root.lchild, depth+1, left_array,left_pos,left_neg, accur, size_x)
 		else:
 			root.lchild = Node()
+			# root.lchild.depth = depth+1
 			root.lchild.label = setlabel(left_pos, left_neg)
 		
 		if right_neg != 0 and right_pos != 0:
@@ -194,24 +195,18 @@ def create_node(root, depth, total_train,root_pos,root_neg, accur,size_x):
 			root.rchild = create_node(root.rchild, depth+1, right_array,right_pos,right_neg, accur, size_x)
 		else:
 			root.rchild = Node()
+			# root.lchild.depth = depth+1
 			root.rchild.label = setlabel(right_pos, right_neg)
 
 	return root
 
-# def compute_accur(accur, leng):
-# 	print('============accur=================================')
-# 	for key in accur:
-# 		print('depth: ', key, " ;  accur:", 1-(accur[key]/leng))
 
 def sort_cut(total_train, feature, theda):
 	x_array_sorted = total_train[total_train[:,feature].argsort()]
 	x_array_sorted_t = np.transpose(x_array_sorted)
-
 	split_point = (x_array_sorted_t[feature] < theda).sum()
-
 	left_array = x_array_sorted[0:split_point]
 	right_array = x_array_sorted[split_point:]
-
 	count_left_neg,count_left_pos,count_right_neg, count_right_pos = split_data(left_array, right_array)
 	
 	return left_array, right_array, count_left_neg,count_left_pos,count_right_neg, count_right_pos
@@ -222,7 +217,6 @@ def sort_cut(total_train, feature, theda):
 def output_pred_y(total_data, root):
 	# print("total_data.shape[1]: ", total_data.shape[0])
 	pred_y = np.zeros(total_data.shape[0])
-
 	find_leaf(total_data, root, pred_y)
 	return pred_y
 
@@ -243,7 +237,6 @@ def get_index(data):
 	idx = trans_data[-1]
 	return idx
 
-#######################AdaBoost##############################
 def Cal_Error(data, root, pred_y):
 	'''
 		Input: label of leaf node(predict), y_idx
@@ -265,7 +258,9 @@ def alpha(data, root, pred_y):
 	return ((1/2)*math.log((1-error)/error))
 
 def ChangeDistribution(data, root,pred_y):
-	# predict_y = output_pred_y(data,root)
+	'''
+		Update D for next tree
+	'''
 	data_y = (data.T)[0]
 	alp = alpha(data, root,pred_y)
 	D_value = 0
@@ -277,9 +272,8 @@ def ChangeDistribution(data, root,pred_y):
 		else:
 			D_value = D[i] * math.exp(-alp)
 			D_1.append(D_value)
-	# D_sum = sum(D_1)
-	# next_D = np.array(D_1)/D_sum
-	next_D = np.array(D_1)
+	D_sum = sum(D_1)
+	next_D = np.array(D_1)/D_sum
 	return next_D
 
 def accu_calculate(pred_y,y_array):
@@ -313,16 +307,15 @@ length = list(range(len(x_array_train)))
 dic_data = list(zip(length, total_train))
 # tree = Create_Tree()
 
-max_depth = 8
+max_depth = 9
 D = np.repeat(1/4888, 4888)
 size_x = total_train.shape[1]
 result_t, result_v = np.zeros(total_train.shape[0]), np.zeros(total_valid.shape[0])
-tmp_y = np.zeros(y_array_train.shape[0])
 
 ##########Run L in [1, 5, 10 ,20]############
-# L = [1, 5, 10, 20]
+L = 1
 tree_list = list()
-for i in range(1):
+for i in range(L):
 	#Create tree
 	tree_list.append(Create_Tree())
 	accur = dict()
@@ -334,11 +327,13 @@ for i in range(1):
 
 	#After Create Tree we can get predict y
 	predict_y = output_pred_y(total_train, tree_list[i].root)
-	tmp_y = predict_y
 	predict_y_v = output_pred_y(total_valid,tree_list[i].root)
+
 	alp = alpha(total_train, tree_list[i].root, predict_y)
+
 	result_v = np.add(alp*predict_y_v, result_v)
 	result_t = np.add(alp*predict_y, result_t)
+
 	D = np.copy(ChangeDistribution(total_train, tree_list[i].root, predict_y))
 	# D = ChangeDistribution(total_train, tree_list[i].root, predict_y)
 	# print("i:", i+1)
